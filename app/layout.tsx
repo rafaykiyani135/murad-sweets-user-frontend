@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import CartDrawer from "@/components/CartDrawer";
 import ToastContainer from "@/components/ToastContainer";
 import MixMatchModal from "@/components/MixMatchModal";
+import CollectionModal from "@/components/CollectionModal";
 
 import type { Viewport } from "next";
 
@@ -35,6 +36,7 @@ export default function RootLayout({
         <CartDrawer />
         <ToastContainer />
         <MixMatchModal />
+        <CollectionModal />
       </body>
     </html>
   );

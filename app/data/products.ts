@@ -248,6 +248,69 @@ export const MIX_MATCH_PRICES = {
   9: 15
 } as const;
 
+export const ASSORTED_BOX_PRICES = {
+  3: 5,
+  6: 10,
+  9: 15
+} as const;
+
+export type AssortedBoxSize = keyof typeof ASSORTED_BOX_PRICES;
+
+export type SweetDisplayMeta = {
+  color: string;
+  bgClass: string;
+  flavorType: string;
+};
+
+export const SWEET_DISPLAY_META: Record<string, SweetDisplayMeta> = {
+  kalojam: { color: '#9B59B6', bgClass: 'bg-purple-100', flavorType: 'Cardamom' },
+  'brown-chom-chom': { color: '#C49A7A', bgClass: 'bg-amber-100', flavorType: 'Chenna' },
+  'white-chom-chom': { color: '#F5E6D3', bgClass: 'bg-orange-50', flavorType: 'Chenna' },
+  'kalojam-sandwich': { color: '#8E44AD', bgClass: 'bg-violet-100', flavorType: 'Malai' },
+  'kheer-mouchak': { color: '#E67E22', bgClass: 'bg-orange-100', flavorType: 'Saffron' },
+  malaikari: { color: '#F39C12', bgClass: 'bg-yellow-100', flavorType: 'Malai' },
+  rajbhog: { color: '#14B8A6', bgClass: 'bg-teal-100', flavorType: 'Saffron' },
+  'kathari-bhog': { color: '#795548', bgClass: 'bg-stone-100', flavorType: 'Jaggery' },
+  laddu: { color: '#D4A341', bgClass: 'bg-amber-50', flavorType: 'Motichoor' },
+  shandesh: { color: '#E8C8C8', bgClass: 'bg-rose-100', flavorType: 'Nolen Gur' },
+  'gulab-jamun-dry': { color: '#7B1E2B', bgClass: 'bg-red-100', flavorType: 'Rose' },
+  peda: { color: '#FADBD8', bgClass: 'bg-pink-50', flavorType: 'Cardamom' },
+  'rasmalai-cake': { color: '#F6DCDC', bgClass: 'bg-blush', flavorType: 'Fusion' },
+  'gulab-jamun': { color: '#681628', bgClass: 'bg-red-50', flavorType: 'Rose' },
+  'mishti-doi': { color: '#FFF4EE', bgClass: 'bg-orange-50', flavorType: 'Fermented' },
+  'small-party-tray': { color: '#541523', bgClass: 'bg-red-50', flavorType: 'Assorted' },
+  'large-party-tray': { color: '#4A0F17', bgClass: 'bg-stone-100', flavorType: 'Assorted' },
+  'jhal-pitha': { color: '#27AE60', bgClass: 'bg-green-100', flavorType: 'Savory' },
+  'puli-pitha': { color: '#8A5A2B', bgClass: 'bg-amber-100', flavorType: 'Coconut' },
+  patishapta: { color: '#D4A341', bgClass: 'bg-yellow-50', flavorType: 'Kheer' },
+};
+
+export const COLLECTION_MODAL_COPY: Record<
+  Product['category'],
+  { tagline: string; title: string; description: string }
+> = {
+  'dry-sweets': {
+    tagline: 'Mix & Match',
+    title: 'Build Your Assorted Box',
+    description: 'Choose a box size, fill each slot with your favorite sweets, and add your custom assortment to cart.',
+  },
+  'party-trays': {
+    tagline: 'Celebrations',
+    title: 'Curate Your Party Tray',
+    description: 'Select a tray size and hand-pick the sweets that will make your gathering unforgettable.',
+  },
+  specialty: {
+    tagline: 'Premium Picks',
+    title: 'Craft Your Specialty Box',
+    description: 'Mix our finest specialty items into a personalized box made just for you.',
+  },
+  pitha: {
+    tagline: 'Heritage',
+    title: 'Build Your Pitha Box',
+    description: 'Choose your box size and fill it with traditional pitha favorites, made the authentic way.',
+  },
+};
+
 export const CATEGORIES = [
   { id: 'dry-sweets', name: 'Dry Sweets (Mix & Match)', count: 12 },
   { id: 'specialty', name: 'Specialty Items', count: 3 },

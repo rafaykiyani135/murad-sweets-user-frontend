@@ -8,6 +8,12 @@ export type MixMatchBox = {
   selectedItems: { id: string; name: string; quantity: number }[]; // array of sweets selected in the box
 };
 
+export type AssortedBox = {
+  size: 3 | 6 | 9;
+  price: number;
+  selectedItems: { name: string; color: string }[];
+};
+
 export type CartItem = {
   cartItemId: string; // unique identifier (productId + timestamp/options for mixMatch)
   productId: string;
@@ -17,6 +23,7 @@ export type CartItem = {
   image?: string;
   unit?: string;
   mixMatch?: MixMatchBox;
+  assortedBox?: AssortedBox;
 };
 
 export type Address = {
@@ -54,6 +61,10 @@ interface CartState {
   mixMatchProduct: Product | null;
   openMixMatch: (product: Product) => void;
   closeMixMatch: () => void;
+  isCollectionModalOpen: boolean;
+  collectionCategory: Product['category'] | null;
+  openCollectionModal: (category: Product['category']) => void;
+  closeCollectionModal: () => void;
   
   // Toast notifications
   toasts: Toast[];
@@ -89,6 +100,8 @@ export const useCartStore = create<CartState>()(
       isCartOpen: false,
       isMixMatchOpen: false,
       mixMatchProduct: null,
+      isCollectionModalOpen: false,
+      collectionCategory: null,
       toasts: [],
       fulfillment: 'pickup',
       scheduledDate: '',
@@ -99,9 +112,9 @@ export const useCartStore = create<CartState>()(
       addToCart: (item) => {
         const cartItems = get().cartItems;
         // Check if standard item already exists
-        if (!item.mixMatch) {
+        if (!item.mixMatch && !item.assortedBox) {
           const existingItemIndex = cartItems.findIndex(
-            (i) => i.productId === item.productId && !i.mixMatch
+            (i) => i.productId === item.productId && !i.mixMatch && !i.assortedBox
           );
           
           if (existingItemIndex > -1) {
@@ -114,7 +127,7 @@ export const useCartStore = create<CartState>()(
         }
         
         // Generate unique cart item ID
-        const cartItemId = item.mixMatch 
+        const cartItemId = item.mixMatch || item.assortedBox
           ? `${item.productId}-${Date.now()}` 
           : item.productId;
           
@@ -155,6 +168,8 @@ export const useCartStore = create<CartState>()(
       setCartOpen: (open) => set({ isCartOpen: open }),
       openMixMatch: (product) => set({ isMixMatchOpen: true, mixMatchProduct: product }),
       closeMixMatch: () => set({ isMixMatchOpen: false, mixMatchProduct: null }),
+      openCollectionModal: (category) => set({ isCollectionModalOpen: true, collectionCategory: category }),
+      closeCollectionModal: () => set({ isCollectionModalOpen: false, collectionCategory: null }),
       
       // Toast Actions
       addToast: (message, type = 'success') => {

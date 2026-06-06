@@ -1,4 +1,8 @@
+'use client';
+
 import Image from 'next/image';
+import { useCart } from '@/app/store/useCart';
+import type { Product } from '@/app/data/products';
 
 const items = [
   {
@@ -108,6 +112,8 @@ function FeatureList({ type, iconImage }: { type: string; features: string[]; ic
 }
 
 export default function CategoryShowcase() {
+  const { openCollectionModal } = useCart();
+
   return (
     <section className="bg-[#FFF9F5] pt-20 overflow-hidden">
       <header className="max-w-[1600px] mx-auto text-center mb-16 flex flex-col items-center px-4">
@@ -152,13 +158,14 @@ export default function CategoryShowcase() {
                     <FeatureList type={item.type} features={item.features} iconImage={item.iconImage} />
                   </div>
 
-                  <a
-                    href="#"
+                  <button
+                    type="button"
+                    onClick={() => openCollectionModal(item.id as Product['category'])}
                     className="inline-flex items-center justify-center gap-3 bg-[#681628] text-white px-8 py-3.5 rounded hover:bg-[#541523] transition-colors font-semibold tracking-wide text-sm sm:text-base w-fit shadow-md hover:shadow-lg"
                   >
                     Explore Collection
                     <span>→</span>
-                  </a>
+                  </button>
                 </div>
               </div>
 
