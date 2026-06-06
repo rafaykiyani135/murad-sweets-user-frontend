@@ -6,6 +6,10 @@ import CartDrawer from "@/components/CartDrawer";
 import ToastContainer from "@/components/ToastContainer";
 import MixMatchModal from "@/components/MixMatchModal";
 import CollectionModal from "@/components/CollectionModal";
+import PartyTrayModal from "@/components/PartyTrayModal";
+import SpecialtyModal from "@/components/SpecialtyModal";
+import PithaModal from "@/components/PithaModal";
+import MishtiPerPoundModal from "@/components/MishtiPerPoundModal";
 
 import type { Viewport } from "next";
 
@@ -37,6 +41,10 @@ export default function RootLayout({
         <ToastContainer />
         <MixMatchModal />
         <CollectionModal />
+        <PartyTrayModal />
+        <SpecialtyModal />
+        <PithaModal />
+        <MishtiPerPoundModal />
       </body>
     </html>
   );

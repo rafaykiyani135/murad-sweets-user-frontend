@@ -13,9 +13,17 @@ import {
   type Product,
 } from '@/app/data/products';
 
-type BoxSweet = { name: string; color: string };
+import Image from 'next/image';
+
+type BoxSweet = { name: string; color: string; image?: string };
 
 const BOX_SIZES: AssortedBoxSize[] = [3, 6, 9];
+
+const BOX_IMAGES = {
+  3: 'https://items-images-production-f.squarecdn.com/files/9ba888a143b397cf4ab2deda5c727d5bb80f8da9/original.jpeg?width=512&crop=1%3A1&format=webp',
+  6: 'https://items-images-production-f.squarecdn.com/files/fc1de58a35a7f9872d30cbc5cd86239cda863980/original.jpeg?width=512&crop=1%3A1&format=webp',
+  9: 'https://items-images-production-f.squarecdn.com/files/eac57c2d50106f70c33ea9f1caee98d15bf707e7/original.jpeg?width=512&crop=1%3A1&format=webp',
+} as const;
 
 const GRID_COLS: Record<AssortedBoxSize, string> = {
   3: 'grid-cols-3',
@@ -70,9 +78,9 @@ export default function CollectionModal() {
     setBoxItems([]);
   };
 
-  const addSweetToBox = (name: string, color: string) => {
+  const addSweetToBox = (name: string, color: string, image?: string) => {
     if (boxItems.length >= boxSize) return;
-    setBoxItems((prev) => [...prev, { name, color }]);
+    setBoxItems((prev) => [...prev, { name, color, image }]);
   };
 
   const removeSweetFromBox = (index: number) => {
@@ -98,7 +106,7 @@ export default function CollectionModal() {
       name: itemName,
       price: boxPrice,
       quantity: 1,
-      image: availableSweets[0]?.images[0],
+      image: BOX_IMAGES[boxSize],
       unit: 'Custom Assortment',
       assortedBox: {
         size: boxSize,
@@ -178,16 +186,27 @@ export default function CollectionModal() {
                               key={size}
                               type="button"
                               onClick={() => selectBoxSize(size, price)}
-                              className={`border-2 rounded-2xl p-4 transition-all text-center ${
+                              className={`border-2 rounded-2xl p-3 transition-all text-center flex flex-col items-center justify-between gap-2.5 ${
                                 isActive
                                   ? 'border-primary bg-primary/5 text-[#1A1A1A] scale-105 shadow-sm'
                                   : 'border-gray-200 hover:border-primary/50 bg-white'
                               }`}
                             >
-                              <span className="text-2xl font-black block">{size}-Pack</span>
-                              <span className="text-xs text-gray-500 font-bold mt-1 block">
-                                ${price}.00
-                              </span>
+                              <div className="relative w-14 h-14 sm:w-20 sm:h-20 bg-blush/30 rounded-xl overflow-hidden shadow-inner shrink-0">
+                                <Image
+                                  src={BOX_IMAGES[size]}
+                                  alt={`${size}-Pack Box`}
+                                  fill
+                                  className="object-cover"
+                                  sizes="(max-width: 640px) 56px, 80px"
+                                />
+                              </div>
+                              <div>
+                                <span className="text-lg sm:text-2xl font-black block">{size}-Pack</span>
+                                <span className="text-xs text-gray-500 font-bold mt-0.5 block">
+                                  ${price}.00
+                                </span>
+                              </div>
                             </button>
                           );
                         })}
@@ -223,23 +242,38 @@ export default function CollectionModal() {
                                   initial={{ scale: 0.85, opacity: 0 }}
                                   animate={{ scale: 1, opacity: 1 }}
                                   transition={{ type: 'spring', stiffness: 400, damping: 22 }}
-                                  className="relative aspect-square bg-white rounded-2xl shadow-sm flex flex-col items-center justify-center p-2 border border-[#E8C8C8]"
+                                  className="relative aspect-square bg-white rounded-2xl shadow-sm overflow-hidden border border-[#E8C8C8]"
                                 >
+                                  {sweet.image ? (
+                                    <Image
+                                      src={sweet.image}
+                                      alt={sweet.name}
+                                      fill
+                                      className="object-cover"
+                                      sizes="(max-width: 640px) 120px, 160px"
+                                    />
+                                  ) : (
+                                    <div
+                                      className="absolute inset-0 flex items-center justify-center"
+                                      style={{ backgroundColor: sweet.color }}
+                                    />
+                                  )}
+
+                                  {/* Gradient Overlay for text legibility */}
+                                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/45 to-transparent pt-6 pb-2 px-2 flex items-end justify-center pointer-events-none">
+                                    <span className="text-[9px] sm:text-[10px] font-extrabold text-white text-center leading-none truncate w-full">
+                                      {sweet.name}
+                                    </span>
+                                  </div>
+
                                   <button
                                     type="button"
                                     onClick={() => removeSweetFromBox(index)}
-                                    className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-gray-100 text-gray-500 hover:bg-primary hover:text-white text-[10px] font-bold flex items-center justify-center transition-colors leading-none"
+                                    className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-black/60 hover:bg-[#681628] text-white text-[10px] font-bold flex items-center justify-center transition-colors leading-none z-10 shadow-md"
                                     aria-label={`Remove ${sweet.name}`}
                                   >
                                     ✕
                                   </button>
-                                  <div
-                                    className="w-7 h-7 rounded-full mb-1.5 shrink-0"
-                                    style={{ backgroundColor: sweet.color }}
-                                  />
-                                  <span className="text-[10px] font-black text-[#1A1A1A] text-center leading-tight line-clamp-2 px-1">
-                                    {sweet.name}
-                                  </span>
                                 </motion.div>
                               );
                             }
@@ -314,7 +348,7 @@ function SweetRow({
 }: {
   product: Product;
   isBoxFull: boolean;
-  onAdd: (name: string, color: string) => void;
+  onAdd: (name: string, color: string, image?: string) => void;
 }) {
   const meta = SWEET_DISPLAY_META[product.slug] ?? {
     color: '#7B1E2B',
@@ -324,26 +358,32 @@ function SweetRow({
 
   return (
     <div className="flex items-center gap-3 p-2 rounded-xl hover:bg-[#FAF6F0]/60 transition-colors">
-      <div
-        className={`w-12 h-12 rounded-full shrink-0 flex items-center justify-center ${meta.bgClass}`}
-      >
-        <SweetIcon color={meta.color} />
-      </div>
+      {product.images?.[0] ? (
+        <div className="relative w-12 h-12 rounded-full shrink-0 overflow-hidden border border-[#E8C8C8]">
+          <Image
+            src={product.images[0]}
+            alt={product.name}
+            fill
+            className="object-cover"
+            sizes="48px"
+          />
+        </div>
+      ) : (
+        <div
+          className={`w-12 h-12 rounded-full shrink-0 flex items-center justify-center ${meta.bgClass}`}
+        >
+          <SweetIcon color={meta.color} />
+        </div>
+      )}
 
       <div className="flex-1 min-w-0">
         <p className="font-bold text-sm leading-snug text-[#1A1A1A]">{product.name}</p>
-        <span
-          className="text-[10px] font-bold uppercase tracking-wider block mt-0.5"
-          style={{ color: meta.color }}
-        >
-          {meta.flavorType}
-        </span>
       </div>
 
       <button
         type="button"
         disabled={isBoxFull}
-        onClick={() => onAdd(product.name, meta.color)}
+        onClick={() => onAdd(product.name, meta.color, product.images?.[0])}
         className={`shrink-0 text-xs font-bold px-3 py-1.5 rounded-full uppercase transition-colors ${
           isBoxFull
             ? 'bg-gray-200 text-gray-400 cursor-not-allowed'

@@ -7,8 +7,8 @@ import type { Product } from '@/app/data/products';
 const items = [
   {
     id: 'dry-sweets',
-    title: 'Dry Sweets',
-    description: 'Timeless favorites made with the finest nuts, khoya and traditional recipes. Perfect for every occasion.',
+    title: 'Mix & Match Boxes',
+    description: 'Build your own perfect box with your favorite mithai - from rich barfis to nutty delights.',
     features: [],
     iconImage: '/Icons/IconRowTwo.png',
     image: '/MithayiBox1.png',
@@ -76,6 +76,15 @@ function CategoryIcon({ id, className }: { id: string; className?: string }) {
       </svg>
     );
   }
+  if (id === 'mishti-per-pound') {
+    return (
+      <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <circle cx="12" cy="12" r="9" />
+        <circle cx="12" cy="12" r="5" fill="currentColor" fillOpacity="0.2" />
+        <path d="M12 3v18M3 12h18" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    );
+  }
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
       <path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z" />
@@ -98,11 +107,11 @@ function FeatureList({ type, iconImage }: { type: string; features: string[]; ic
   if (type === 'image-row' && iconImage) {
     return (
       <div className="w-full relative h-[40px] sm:h-[140px] md:h-[180px] lg:h-[220px]">
-        <Image 
-          src={iconImage} 
-          alt="Category Icons" 
-          fill 
-          className="object-contain mix-blend-multiply object-left" 
+        <Image
+          src={iconImage}
+          alt="Category Icons"
+          fill
+          className="object-contain mix-blend-multiply object-left"
         />
       </div>
     );
@@ -112,30 +121,43 @@ function FeatureList({ type, iconImage }: { type: string; features: string[]; ic
 }
 
 export default function CategoryShowcase() {
-  const { openCollectionModal } = useCart();
+  const { openCollectionModal, openPartyTrayModal, openSpecialtyModal, openPithaModal, openMishtiPerPoundModal } = useCart();
+
+  const showcaseItems = [
+    ...items,
+    {
+      id: 'mishti-per-pound',
+      title: 'Mishti Per Pound',
+      description: 'Purchase your favorite traditional sweets by the pound or dozen. Handcrafted fresh daily.',
+      features: [],
+      iconImage: '/Icons/IconRowTwo.png',
+      image: '/mishtiperpound.png',
+      type: 'image-row'
+    }
+  ];
 
   return (
-    <section className="bg-[#FFF9F5] pt-20 overflow-hidden">
+    <section className="bg-[#4A0F17] pt-20 overflow-hidden">
       <header className="max-w-[1600px] mx-auto text-center mb-16 flex flex-col items-center px-4">
-        <svg className="w-6 h-6 text-[#c97d4e] mb-4" viewBox="0 0 24 24" fill="currentColor">
+        <svg className="w-6 h-6 text-accent mb-4" viewBox="0 0 24 24" fill="currentColor">
           <path d="M12 2C12 2 15 7 15 12C15 17 12 22 12 22C12 22 9 17 9 12C9 7 12 2 12 2Z" />
           <path d="M22 12C22 12 17 15 12 15C7 15 2 12 2 12C2 12 7 9 12 9C17 9 22 12 22 12Z" />
         </svg>
-        <h2 className="text-5xl md:text-6xl lg:text-7xl font-serif font-bold text-[#541523] mb-4">
+        <h2 className="text-5xl md:text-6xl lg:text-7xl font-serif font-bold text-cream mb-4">
           Our Sweet<br />Collections
         </h2>
-        <svg className="w-6 h-6 text-[#c97d4e] mt-2 rotate-180" viewBox="0 0 24 24" fill="currentColor">
+        <svg className="w-6 h-6 text-accent mt-2 rotate-180" viewBox="0 0 24 24" fill="currentColor">
           <path d="M12 2C12 2 15 7 15 12C15 17 12 22 12 22C12 22 9 17 9 12C9 7 12 2 12 2Z" />
           <path d="M22 12C22 12 17 15 12 15C7 15 2 12 2 12C2 12 7 9 12 9C17 9 22 12 22 12Z" />
         </svg>
-        <p className="mt-8 text-[#541523]/80 text-lg md:text-xl font-medium max-w-2xl mx-auto leading-relaxed">
+        <p className="mt-8 text-cream/80 text-lg md:text-xl font-medium max-w-2xl mx-auto leading-relaxed">
           Handcrafted with tradition, made fresh with premium ingredients, and shared with love.
         </p>
       </header>
 
       <div className="flex flex-col w-full">
-        {items.map((item, index) => {
-          const imageLeft = index % 2 === 1; // 0: Right, 1: Left, 2: Right, 3: Left
+        {showcaseItems.map((item, index) => {
+          const imageLeft = index % 2 === 1; // Alternating layout
           return (
             <div key={item.id} className={`flex ${imageLeft ? 'flex-row-reverse' : 'flex-row'} w-full bg-[#FFF4EE]`}>
               {/* Text content */}
@@ -160,7 +182,19 @@ export default function CategoryShowcase() {
 
                   <button
                     type="button"
-                    onClick={() => openCollectionModal(item.id as Product['category'])}
+                    onClick={() => {
+                      if (item.id === 'party-trays') {
+                        openPartyTrayModal();
+                      } else if (item.id === 'specialty') {
+                        openSpecialtyModal();
+                      } else if (item.id === 'pitha') {
+                        openPithaModal();
+                      } else if (item.id === 'mishti-per-pound') {
+                        openMishtiPerPoundModal();
+                      } else {
+                        openCollectionModal(item.id as Product['category']);
+                      }
+                    }}
                     className="inline-flex items-center justify-center gap-1 sm:gap-3 bg-[#681628] text-white px-3 py-1.5 sm:px-8 sm:py-3.5 rounded hover:bg-[#541523] transition-colors font-semibold tracking-wide text-[9px] sm:text-sm md:text-base w-fit shadow-md hover:shadow-lg"
                   >
                     Explore Collection

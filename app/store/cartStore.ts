@@ -11,7 +11,7 @@ export type MixMatchBox = {
 export type AssortedBox = {
   size: 3 | 6 | 9;
   price: number;
-  selectedItems: { name: string; color: string }[];
+  selectedItems: { name: string; color: string; image?: string }[];
 };
 
 export type CartItem = {
@@ -65,6 +65,18 @@ interface CartState {
   collectionCategory: Product['category'] | null;
   openCollectionModal: (category: Product['category']) => void;
   closeCollectionModal: () => void;
+  isPartyTrayModalOpen: boolean;
+  openPartyTrayModal: () => void;
+  closePartyTrayModal: () => void;
+  isSpecialtyModalOpen: boolean;
+  openSpecialtyModal: () => void;
+  closeSpecialtyModal: () => void;
+  isPithaModalOpen: boolean;
+  openPithaModal: () => void;
+  closePithaModal: () => void;
+  isMishtiPerPoundModalOpen: boolean;
+  openMishtiPerPoundModal: () => void;
+  closeMishtiPerPoundModal: () => void;
   
   // Toast notifications
   toasts: Toast[];
@@ -102,6 +114,10 @@ export const useCartStore = create<CartState>()(
       mixMatchProduct: null,
       isCollectionModalOpen: false,
       collectionCategory: null,
+      isPartyTrayModalOpen: false,
+      isSpecialtyModalOpen: false,
+      isPithaModalOpen: false,
+      isMishtiPerPoundModalOpen: false,
       toasts: [],
       fulfillment: 'pickup',
       scheduledDate: '',
@@ -170,6 +186,14 @@ export const useCartStore = create<CartState>()(
       closeMixMatch: () => set({ isMixMatchOpen: false, mixMatchProduct: null }),
       openCollectionModal: (category) => set({ isCollectionModalOpen: true, collectionCategory: category }),
       closeCollectionModal: () => set({ isCollectionModalOpen: false, collectionCategory: null }),
+      openPartyTrayModal: () => set({ isPartyTrayModalOpen: true }),
+      closePartyTrayModal: () => set({ isPartyTrayModalOpen: false }),
+      openSpecialtyModal: () => set({ isSpecialtyModalOpen: true }),
+      closeSpecialtyModal: () => set({ isSpecialtyModalOpen: false }),
+      openPithaModal: () => set({ isPithaModalOpen: true }),
+      closePithaModal: () => set({ isPithaModalOpen: false }),
+      openMishtiPerPoundModal: () => set({ isMishtiPerPoundModalOpen: true }),
+      closeMishtiPerPoundModal: () => set({ isMishtiPerPoundModalOpen: false }),
       
       // Toast Actions
       addToast: (message, type = 'success') => {

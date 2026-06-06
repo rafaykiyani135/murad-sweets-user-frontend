@@ -2,7 +2,7 @@ export type Product = {
   id: string;
   slug: string;
   name: string;
-  category: 'dry-sweets' | 'specialty' | 'party-trays' | 'pitha';
+  category: 'dry-sweets' | 'specialty' | 'party-trays' | 'pitha' | 'mishti-per-pound';
   description: string;
   price: number;         // base price (0 for dry-sweets since they are Mix & Match)
   unit?: string;         // e.g. "per box (4pc)", "per cake (8oz)"
@@ -19,9 +19,9 @@ export const PRODUCTS: Product[] = [
     slug: 'kalojam',
     name: 'Kalojam',
     category: 'dry-sweets',
-    description: 'Traditional deep-fried milk-solid dumplings soaked in cardamom-infused sugar syrup, featuring a dark, caramelized outer layer and a soft, melt-in-your-mouth center.',
+    description: 'Traditional deep-fried milk-solid dumplings soaked in cardamom-infused sugar syrup, featuring a dark, caramelized outer layer.',
     price: 0,
-    images: ['https://images.unsplash.com/photo-1601356616077-695728ecf769?w=600&auto=format&fit=crop&q=80'],
+    images: ['https://items-images-production-f.squarecdn.com/files/ef1d699f951f2db300ae859cc6b39897c79095b8/original.jpeg?width=128&crop=1%3A1&format=webp'],
     inStock: true,
     isMixMatch: true
   },
@@ -30,9 +30,9 @@ export const PRODUCTS: Product[] = [
     slug: 'brown-chom-chom',
     name: 'Brown Chom Chom',
     category: 'dry-sweets',
-    description: 'Classic Bangladeshi oval-shaped sweet made of dense chenna (curdled milk), slowly cooked to a rich mahogany brown color and rolled in mawa crumbs.',
+    description: 'Classic Bangladeshi oval-shaped sweet made of dense chenna (curdled milk), slowly cooked to a rich mahogany brown color.',
     price: 0,
-    images: ['https://images.unsplash.com/photo-1548680373-ab6d4a5b48d7?w=600&auto=format&fit=crop&q=80'],
+    images: ['https://items-images-production-f.squarecdn.com/files/0a1baff12638918784fd42eec0e02233c57874f2/original.jpeg?width=128&crop=1%3A1&format=webp'],
     inStock: true,
     isMixMatch: true
   },
@@ -41,9 +41,9 @@ export const PRODUCTS: Product[] = [
     slug: 'white-chom-chom',
     name: 'White Chom Chom',
     category: 'dry-sweets',
-    description: 'Delicate, ivory-white chom chom made of soft chenna, simmered in light sugar syrup, offering a moist texture and mild sweetness.',
+    description: 'Delicate, ivory-white chom chom made of soft chenna, simmered in light sugar syrup, offering a moist texture.',
     price: 0,
-    images: ['https://images.unsplash.com/photo-1589135306090-e5550a6f0a0d?w=600&auto=format&fit=crop&q=80'],
+    images: ['https://items-images-production-f.squarecdn.com/files/85c894a2cdfa49fc91468a6ed389376d7bd901e1/original.png?width=128&crop=1%3A1&format=webp'],
     inStock: true,
     isMixMatch: true
   },
@@ -52,9 +52,9 @@ export const PRODUCTS: Product[] = [
     slug: 'kalojam-sandwich',
     name: 'Kalojam Sandwich',
     category: 'dry-sweets',
-    description: 'An elegant variation of Kalojam, sliced open and filled with a thick layer of sweetened cream (malai) and garnished with nuts.',
+    description: 'An elegant variation of Kalojam, sliced open and filled with a thick layer of sweetened cream (malai).',
     price: 0,
-    images: ['https://images.unsplash.com/photo-1605697040924-852290747ef4?w=600&auto=format&fit=crop&q=80'],
+    images: ['https://items-images-production-f.squarecdn.com/files/1e4a710e5852bebb0ec3993ac604e4dd9dedf4c5/original.jpeg?width=128&crop=1%3A1&format=webp'],
     inStock: true,
     isMixMatch: true
   },
@@ -63,9 +63,9 @@ export const PRODUCTS: Product[] = [
     slug: 'kheer-mouchak',
     name: 'Kheer Mouchak',
     category: 'dry-sweets',
-    description: 'A honeycomb-shaped royal delight made with chenna, soaked in saffron syrup, and covered with creamy, reduced milk kheer.',
+    description: 'A honeycomb-shaped royal delight made with chenna, soaked in saffron syrup, and covered with creamy kheer.',
     price: 0,
-    images: ['https://images.unsplash.com/photo-1505253716362-afaea1d3d1af?w=600&auto=format&fit=crop&q=80'],
+    images: ['https://items-images-production-f.squarecdn.com/files/6b5ab94ac6f70f24feba421fb318ef7c9efa9917/original.jpeg?width=128&crop=1%3A1&format=webp'],
     inStock: true,
     isMixMatch: true
   },
@@ -76,7 +76,7 @@ export const PRODUCTS: Product[] = [
     category: 'dry-sweets',
     description: 'Plump chenna rounds cooked in syrup and then coated with a luscious, rich saffron malai reduction.',
     price: 0,
-    images: ['https://images.unsplash.com/photo-1589135306090-e5550a6f0a0d?w=600&auto=format&fit=crop&q=80'],
+    images: ['https://items-images-production-f.squarecdn.com/files/b1197d7095486976b4b572dbd02f821bfdbca151/original.jpeg?width=128&crop=1%3A1&format=webp'],
     inStock: true,
     isMixMatch: true
   },
@@ -87,7 +87,7 @@ export const PRODUCTS: Product[] = [
     category: 'dry-sweets',
     description: 'Grand-sized chenna spheres stuffed with dry fruits, simmered in a fragrant saffron and cardamom syrup.',
     price: 0,
-    images: ['https://images.unsplash.com/photo-1601356616077-695728ecf769?w=600&auto=format&fit=crop&q=80'],
+    images: ['https://items-images-production-f.squarecdn.com/files/95c97a84a6f3b0265c89796fe61e83547fc30bbd/original.jpeg?width=128&crop=1%3A1&format=webp'],
     inStock: true,
     isMixMatch: true
   },
@@ -96,9 +96,9 @@ export const PRODUCTS: Product[] = [
     slug: 'kathari-bhog',
     name: 'Kathari Bhog',
     category: 'dry-sweets',
-    description: 'An artisanal Bangladeshi sweet consisting of small, textured chenna balls cooked in premium date jaggery syrup for an earthy, deep flavor.',
+    description: 'An artisanal Bangladeshi sweet consisting of small chenna balls cooked in premium date jaggery syrup.',
     price: 0,
-    images: ['https://images.unsplash.com/photo-1548680373-ab6d4a5b48d7?w=600&auto=format&fit=crop&q=80'],
+    images: ['https://items-images-production-f.squarecdn.com/files/5f2e1c7cf8e32ecc2c4dec89d5b0add8c62faa72/original.jpeg?width=128&crop=1%3A1&format=webp'],
     inStock: true,
     isMixMatch: true
   },
@@ -107,9 +107,9 @@ export const PRODUCTS: Product[] = [
     slug: 'laddu',
     name: 'Laddu',
     category: 'dry-sweets',
-    description: 'Aromatic Motichoor Laddus made from tiny chickpea flour globules fried in pure ghee, sweetened and shaped into golden spheres.',
+    description: 'Aromatic Motichoor Laddus made from tiny chickpea flour globules fried in pure ghee.',
     price: 0,
-    images: ['/laddu.png'],
+    images: ['https://items-images-production-f.squarecdn.com/files/3894a89462eb13d67a7d65a15bed28c891501566/original.jpeg?width=128&crop=1%3A1&format=webp'],
     inStock: true,
     isMixMatch: true
   },
@@ -118,20 +118,20 @@ export const PRODUCTS: Product[] = [
     slug: 'shandesh',
     name: 'Shandesh',
     category: 'dry-sweets',
-    description: 'Traditional dry sweet made from fresh paneer and date molasses (Nolen Gur), molded into artistic patterns.',
+    description: 'Traditional dry sweet made from fresh paneer and date molasses (Nolen Gur).',
     price: 0,
-    images: ['https://images.unsplash.com/photo-1589135306090-e5550a6f0a0d?w=600&auto=format&fit=crop&q=80'],
+    images: ['https://items-images-production-f.squarecdn.com/files/c3fd77de3125fbebfaf08a34328df9718f044cf9/original.jpeg?width=128&crop=1%3A1&format=webp'],
     inStock: true,
     isMixMatch: true
   },
   {
     id: '11',
     slug: 'gulab-jamun-dry',
-    name: 'Gulab Jamun (dry)',
+    name: 'Gulab Jamun',
     category: 'dry-sweets',
-    description: 'Soft milk-solid balls fried, sweetened, and rolled in dry desiccated coconut, making them clean and easy to handle.',
+    description: 'Soft milk-solid balls fried, sweetened, and rolled in dry desiccated coconut.',
     price: 0,
-    images: ['/gulab-jamun.png'],
+    images: ['https://items-images-production-f.squarecdn.com/files/e165ec6df7b6a9094b2a46d22efc4d107061e1f8/original.jpeg?width=128&crop=1%3A1&format=webp'],
     inStock: true,
     isMixMatch: true
   },
@@ -140,10 +140,10 @@ export const PRODUCTS: Product[] = [
     slug: 'peda',
     name: 'Peda',
     category: 'dry-sweets',
-    description: 'Rich, semi-soft sweet made of condensed milk, sugar, and traditional flavorings including green cardamom and saffron.',
+    description: 'Rich, semi-soft sweet made of condensed milk, sugar, and traditional flavorings.',
     price: 0,
-    images: ['https://images.unsplash.com/photo-1589135306090-e5550a6f0a0d?w=600&auto=format&fit=crop&q=80'],
-    inStock: false, // Mark this one as Sold Out for UI validation
+    images: ['https://items-images-production-f.squarecdn.com/files/5959be5a1eecc7bcef1982dcc39a1fe151edabd7/original.jpeg?width=128&crop=1%3A1&format=webp'],
+    inStock: true,
     isMixMatch: true
   },
   {
@@ -239,6 +239,171 @@ export const PRODUCTS: Product[] = [
     minOrderQty: 10,
     images: ['https://images.unsplash.com/photo-1587314168485-3236d6710814?w=600&auto=format&fit=crop&q=80'],
     inStock: true
+  },
+  {
+    id: '21',
+    slug: 'mpp-brown-chom-chom',
+    name: 'Brown Chom Chom',
+    category: 'mishti-per-pound',
+    description: 'Classic Bangladeshi oval-shaped sweet made of dense chenna (curdled milk), slowly cooked to a rich mahogany brown color.',
+    price: 13,
+    unit: 'per lb',
+    images: ['https://items-images-production-f.squarecdn.com/files/0a1baff12638918784fd42eec0e02233c57874f2/original.jpeg?width=512&crop=1%3A1&format=webp'],
+    inStock: true
+  },
+  {
+    id: '22',
+    slug: 'mpp-white-chom-chom',
+    name: 'White Chom Chom',
+    category: 'mishti-per-pound',
+    description: 'Delicate, ivory-white chom chom made of soft chenna, simmered in light syrup.',
+    price: 12,
+    unit: 'per lb',
+    images: ['https://items-images-production-f.squarecdn.com/files/85c894a2cdfa49fc91468a6ed389376d7bd901e1/original.png?width=640&crop=1%3A1&format=webp'],
+    inStock: true
+  },
+  {
+    id: '23',
+    slug: 'mpp-kalojam',
+    name: 'Kalojam',
+    category: 'mishti-per-pound',
+    description: 'Traditional deep-fried milk-solid dumplings soaked in sugar syrup, featuring a caramelized outer layer.',
+    price: 12,
+    unit: 'per lb',
+    images: ['https://items-images-production-f.squarecdn.com/files/ef1d699f951f2db300ae859cc6b39897c79095b8/original.jpeg?width=640&crop=1%3A1&format=webp'],
+    inStock: true
+  },
+  {
+    id: '24',
+    slug: 'mpp-rajbhog',
+    name: 'Rajbhog',
+    category: 'mishti-per-pound',
+    description: 'Grand-sized chenna spheres stuffed with dry fruits, simmered in saffron syrup.',
+    price: 12,
+    unit: 'per lb',
+    images: ['https://items-images-production-f.squarecdn.com/files/95c97a84a6f3b0265c89796fe61e83547fc30bbd/original.jpeg?width=640&crop=1%3A1&format=webp'],
+    inStock: true
+  },
+  {
+    id: '25',
+    slug: 'mpp-malaikari',
+    name: 'Malaikari',
+    category: 'mishti-per-pound',
+    description: 'Plump chenna rounds cooked in syrup and coated with luscious saffron malai reduction.',
+    price: 13,
+    unit: 'per lb',
+    images: ['https://items-images-production-f.squarecdn.com/files/b1197d7095486976b4b572dbd02f821bfdbca151/original.jpeg?width=640&crop=1%3A1&format=webp'],
+    inStock: true
+  },
+  {
+    id: '26',
+    slug: 'mpp-shandesh',
+    name: 'Shandesh',
+    category: 'mishti-per-pound',
+    description: 'Traditional dry sweet made from fresh paneer and date molasses.',
+    price: 13,
+    unit: 'per lb',
+    images: ['https://items-images-production-f.squarecdn.com/files/c3fd77de3125fbebfaf08a34328df9718f044cf9/original.jpeg?width=640&crop=1%3A1&format=webp'],
+    inStock: true
+  },
+  {
+    id: '27',
+    slug: 'mpp-gulab-jamun',
+    name: 'Gulab Jamun',
+    category: 'mishti-per-pound',
+    description: 'Soft milk-solid balls fried, sweetened, and rolled in desiccated coconut.',
+    price: 12,
+    unit: 'per lb',
+    images: ['https://items-images-production-f.squarecdn.com/files/e165ec6df7b6a9094b2a46d22efc4d107061e1f8/original.jpeg?width=640&crop=1%3A1&format=webp'],
+    inStock: true
+  },
+  {
+    id: '28',
+    slug: 'mpp-kheer-mouchak',
+    name: 'Kheer Mouchak',
+    category: 'mishti-per-pound',
+    description: 'Honeycomb-shaped delight made with chenna and covered with creamy reduced milk.',
+    price: 13,
+    unit: 'per lb',
+    images: ['https://items-images-production-f.squarecdn.com/files/6b5ab94ac6f70f24feba421fb318ef7c9efa9917/original.jpeg?width=640&crop=1%3A1&format=webp'],
+    inStock: true
+  },
+  {
+    id: '29',
+    slug: 'mpp-kala-jamun-sandwich',
+    name: 'Kala Jamun Sandwich',
+    category: 'mishti-per-pound',
+    description: 'Variation of Kalojam filled with a thick layer of sweetened cream (malai).',
+    price: 13,
+    unit: 'per lb',
+    images: ['https://items-images-production-f.squarecdn.com/files/1e4a710e5852bebb0ec3993ac604e4dd9dedf4c5/original.jpeg?width=640&crop=1%3A1&format=webp'],
+    inStock: true
+  },
+  {
+    id: '30',
+    slug: 'mpp-laddu',
+    name: 'Laddu',
+    category: 'mishti-per-pound',
+    description: 'Aromatic Motichoor Laddus made from tiny chickpea flour globules.',
+    price: 13,
+    unit: 'per lb',
+    images: ['https://items-images-production-f.squarecdn.com/files/3894a89462eb13d67a7d65a15bed28c891501566/original.jpeg?width=640&crop=1%3A1&format=webp'],
+    inStock: true
+  },
+  {
+    id: '31',
+    slug: 'mpp-katari-bhog',
+    name: 'Katari Bhog',
+    category: 'mishti-per-pound',
+    description: 'Artisanal sweet consisting of textured chenna balls cooked in date jaggery syrup.',
+    price: 15,
+    unit: 'per lb',
+    images: ['https://items-images-production-f.squarecdn.com/files/5f2e1c7cf8e32ecc2c4dec89d5b0add8c62faa72/original.jpeg?width=640&crop=1%3A1&format=webp'],
+    inStock: true
+  },
+  {
+    id: '32',
+    slug: 'mpp-sponge-roshogolla',
+    name: 'Sponge RoshoGolla',
+    category: 'mishti-per-pound',
+    description: 'Light, spongy cottage cheese balls soaked in clear sugar syrup.',
+    price: 13,
+    unit: 'per lb',
+    images: ['https://items-images-production-f.squarecdn.com/files/0029b1cd24594552c6599c39c2cae943b9cf9add/original.jpeg?width=640&crop=1%3A1&format=webp'],
+    inStock: true
+  },
+  {
+    id: '33',
+    slug: 'mpp-classic-roshogolla',
+    name: 'Classic RoshoGolla',
+    category: 'mishti-per-pound',
+    description: 'Traditional Bengali melt-in-mouth cottage cheese balls in sweet syrup.',
+    price: 12,
+    unit: 'per lb',
+    images: ['https://items-images-production-f.squarecdn.com/files/e8fc97b3018980221d29bdab1d177b64e46fe4be/original.jpeg?width=640&crop=1%3A1&format=webp'],
+    inStock: true
+  },
+  {
+    id: '34',
+    slug: 'mpp-peda',
+    name: 'Peda',
+    category: 'mishti-per-pound',
+    description: 'Rich, semi-soft sweet made of condensed milk and sugar.',
+    price: 12,
+    unit: 'per dozen',
+    images: ['https://items-images-production-f.squarecdn.com/files/5959be5a1eecc7bcef1982dcc39a1fe151edabd7/original.jpeg?width=640&crop=1%3A1&format=webp'],
+    inStock: true
+  },
+  {
+    id: '35',
+    slug: 'mpp-katcha-golla',
+    name: 'Katcha Golla',
+    category: 'mishti-per-pound',
+    description: 'Soft, melt-in-the-mouth raw sweet made of fresh chenna and sugar.',
+    price: 14,
+    unit: 'per lb',
+    images: ['https://items-images-production-f.squarecdn.com/files/31d55e49fd7912d22b9914e99509e815420f3236/original.jpeg?width=640&crop=1%3A1&format=webp'],
+    inStock: true
   }
 ];
 
@@ -309,11 +474,17 @@ export const COLLECTION_MODAL_COPY: Record<
     title: 'Build Your Pitha Box',
     description: 'Choose your box size and fill it with traditional pitha favorites, made the authentic way.',
   },
+  'mishti-per-pound': {
+    tagline: 'Fresh & Traditional',
+    title: 'Mishti Per Pound',
+    description: 'Select your favorite sweets and buy them by the pound or dozen, prepared fresh daily.',
+  },
 };
 
 export const CATEGORIES = [
   { id: 'dry-sweets', name: 'Dry Sweets (Mix & Match)', count: 12 },
   { id: 'specialty', name: 'Specialty Items', count: 3 },
   { id: 'party-trays', name: 'Party Trays', count: 2 },
-  { id: 'pitha', name: 'Traditional Pitha (Pre-Order Only)', count: 3 }
+  { id: 'pitha', name: 'Traditional Pitha (Pre-Order Only)', count: 3 },
+  { id: 'mishti-per-pound', name: 'Mishti Per Pound', count: 15 }
 ];

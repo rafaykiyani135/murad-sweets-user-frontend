@@ -11,6 +11,10 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'ibb.co',
       },
+      {
+        protocol: 'https',
+        hostname: 'items-images-production-f.squarecdn.com',
+      },
     ],
   },
 };

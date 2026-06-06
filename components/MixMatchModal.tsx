@@ -5,6 +5,13 @@ import { X, Plus, Minus, Check } from 'lucide-react';
 import { useCart } from '@/app/store/useCart';
 import { PRODUCTS, MIX_MATCH_PRICES } from '@/app/data/products';
 import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
+
+const BOX_IMAGES = {
+  3: 'https://items-images-production-f.squarecdn.com/files/9ba888a143b397cf4ab2deda5c727d5bb80f8da9/original.jpeg?width=512&crop=1%3A1&format=webp',
+  6: 'https://items-images-production-f.squarecdn.com/files/fc1de58a35a7f9872d30cbc5cd86239cda863980/original.jpeg?width=512&crop=1%3A1&format=webp',
+  9: 'https://items-images-production-f.squarecdn.com/files/eac57c2d50106f70c33ea9f1caee98d15bf707e7/original.jpeg?width=512&crop=1%3A1&format=webp',
+} as const;
 
 export default function MixMatchModal() {
   const { isMixMatchOpen, mixMatchProduct, closeMixMatch, addToCart } = useCart();
@@ -77,7 +84,7 @@ export default function MixMatchModal() {
       name: `${boxSize} Pcs Mix & Match Box`,
       price,
       quantity: 1,
-      image: mixMatchProduct.images[0],
+      image: BOX_IMAGES[boxSize],
       unit: 'Custom Assortment',
       mixMatch: {
         size: boxSize,
@@ -140,16 +147,27 @@ export default function MixMatchModal() {
                       <button
                         key={size}
                         onClick={() => handleSizeChange(size)}
-                        className={`p-3.5 rounded-lg border text-center transition-all duration-300 flex flex-col items-center justify-center space-y-1 ${
+                        className={`p-3 rounded-lg border text-center transition-all duration-300 flex flex-col items-center justify-between gap-2.5 ${
                           isSelected
                             ? 'bg-primary border-primary text-white shadow-md'
                             : 'bg-white border-border text-primary-deep hover:border-primary/50'
                         }`}
                       >
-                        <span className="font-cinzel text-sm font-bold">{size} Pieces</span>
-                        <span className={`text-xs ${isSelected ? 'text-accent' : 'text-accent font-semibold'}`}>
-                          ${price}.00
-                        </span>
+                        <div className="relative w-12 h-12 sm:w-16 sm:h-16 bg-blush/30 rounded-lg overflow-hidden shadow-inner shrink-0">
+                          <Image
+                            src={BOX_IMAGES[size]}
+                            alt={`${size} Pieces Box`}
+                            fill
+                            className="object-cover"
+                            sizes="(max-width: 640px) 48px, 64px"
+                          />
+                        </div>
+                        <div>
+                          <span className="font-cinzel text-xs sm:text-sm font-bold block">{size} Pieces</span>
+                          <span className={`text-xs block mt-0.5 ${isSelected ? 'text-accent' : 'text-[#681628] font-bold'}`}>
+                            ${price}.00
+                          </span>
+                        </div>
                       </button>
                     );
                   })}
@@ -177,9 +195,22 @@ export default function MixMatchModal() {
                           count > 0 ? 'border-primary/60 shadow-sm' : 'border-border'
                         }`}
                       >
-                        <div className="flex flex-col min-w-0 pr-2">
-                          <span className="font-cinzel text-xs font-semibold text-primary-deep truncate">{sweet.name}</span>
-                          <span className="text-[10px] text-brown font-body line-clamp-1 mt-0.5">{sweet.description}</span>
+                        <div className="flex items-center gap-2.5 min-w-0 pr-2 flex-1">
+                          {sweet.images?.[0] && (
+                            <div className="relative w-10 h-10 rounded-full overflow-hidden border border-border shrink-0">
+                              <Image
+                                src={sweet.images[0]}
+                                alt={sweet.name}
+                                fill
+                                className="object-cover"
+                                sizes="40px"
+                              />
+                            </div>
+                          )}
+                          <div className="min-w-0 flex-1">
+                            <span className="font-cinzel text-xs font-semibold text-primary-deep block truncate">{sweet.name}</span>
+                            <span className="text-[10px] text-brown font-body line-clamp-1 mt-0.5">{sweet.description}</span>
+                          </div>
                         </div>
 
                         {/* Adjuster */}
