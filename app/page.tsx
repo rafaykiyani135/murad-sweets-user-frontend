@@ -17,7 +17,7 @@ export default function Home() {
   return (
     <div className="flex flex-col w-full bg-cream">
       {/* 1. HERO SECTION */}
-      <section className="relative min-h-[85vh] flex items-center justify-start py-20 overflow-hidden">
+      <section className="relative min-h-[90vh] md:min-h-[85vh] flex items-center justify-start pt-28 pb-12 md:py-20 overflow-hidden">
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
           <Image
@@ -25,12 +25,19 @@ export default function Home() {
             alt="Murad Sweets Background"
             fill
             priority
-            className="object-cover object-right sm:object-center"
+            className="hidden sm:block object-cover object-center"
+          />
+          <Image
+            src="/HeroSectionImagePhone.png"
+            alt="Murad Sweets Background Mobile"
+            fill
+            priority
+            className="block sm:hidden object-cover object-center"
           />
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10">
-          <div className="max-w-2xl space-y-8 text-left">
+          <div className="w-[65%] sm:w-full max-w-2xl space-y-8 text-left">
             <motion.div
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
@@ -67,8 +74,8 @@ export default function Home() {
             >
               <div className="w-12 h-[2px] bg-accent/60" />
               <p className="text-base sm:text-lg text-primary-deep font-body leading-relaxed max-w-md">
-                Traditional recipes. Premium ingredients.<br />
-                Handcrafted with care in Houston.
+                Traditional recipes. <br /> Premium ingredients.<br />
+                Handcrafted with care <br /> in Houston.
               </p>
             </motion.div>
 
@@ -145,9 +152,9 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 5. HOW IT WORKS */}
+
       <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-        <div className="text-center space-y-2">
+        {/* <div className="text-center space-y-2">
           <span className="font-script text-accent text-3xl">Fulfillment Workflow</span>
           <h2 className="font-heading text-3xl sm:text-4xl text-primary font-extrabold tracking-tight">
             How It Works
@@ -155,7 +162,7 @@ export default function Home() {
           <p className="text-xs sm:text-sm text-brown font-subheading uppercase tracking-widest">
             Ordering is simple, fast, and scheduled
           </p>
-        </div>
+        </div> */}
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {[
