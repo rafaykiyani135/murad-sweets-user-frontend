@@ -16,7 +16,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     if (product.category === 'dry-sweets') {
       openMixMatch(product);
     } else {
@@ -44,11 +44,10 @@ export default function ProductCard({ product }: ProductCardProps) {
   };
 
   return (
-    <Link 
-      href={`/products/${product.slug}`} 
-      className={`group relative premium-card flex flex-col h-full overflow-hidden ${
-        !product.inStock ? 'opacity-70' : ''
-      }`}
+    <Link
+      href={`/products/${product.slug}`}
+      className={`group relative premium-card flex flex-col h-full overflow-hidden ${!product.inStock ? 'opacity-70' : ''
+        }`}
     >
       {/* Product Image Wrapper */}
       <div className="aspect-square w-full relative bg-blush overflow-hidden">
@@ -62,7 +61,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-primary/45 font-subheading">
-            Mithai
+            Mishti
           </div>
         )}
 
@@ -126,11 +125,10 @@ export default function ProductCard({ product }: ProductCardProps) {
           <button
             onClick={handleAddToCart}
             disabled={!product.inStock}
-            className={`p-2.5 rounded-full flex items-center justify-center transition-all duration-200 ${
-              !product.inStock
+            className={`p-2.5 rounded-full flex items-center justify-center transition-all duration-200 ${!product.inStock
                 ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
                 : 'bg-primary text-white hover:bg-accent hover:text-primary-deep shadow-sm'
-            }`}
+              }`}
             aria-label={product.category === 'dry-sweets' ? 'Select options' : 'Add to cart'}
           >
             {product.category === 'dry-sweets' ? (

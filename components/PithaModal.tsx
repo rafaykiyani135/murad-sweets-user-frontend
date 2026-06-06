@@ -1,6 +1,7 @@
 'use client';
 
-import { X, Check } from 'lucide-react';
+import { useState } from 'react';
+import { X, Check, Minus, Plus } from 'lucide-react';
 import { useCart } from '@/app/store/useCart';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
@@ -36,15 +37,26 @@ export default function PithaModal() {
     addToCart,
   } = useCart();
 
-  const handleAddToCart = (item: typeof PITHA_ITEMS[0]) => {
+  const [quantities, setQuantities] = useState<Record<string, number>>({});
+
+  const getQty = (id: string) => quantities[id] || 1;
+  const updateQty = (id: string, delta: number) => {
+    setQuantities((prev) => ({
+      ...prev,
+      [id]: Math.max(1, (prev[id] || 1) + delta),
+    }));
+  };
+
+  const handleAddToCart = (item: typeof PITHA_ITEMS[0], quantity: number) => {
     addToCart({
       productId: `pitha-${item.id}`,
       name: item.name,
       price: item.price,
-      quantity: 1,
+      quantity,
       image: item.image,
       unit: '10pc box',
     });
+    setQuantities((prev) => ({ ...prev, [item.id]: 1 }));
     closePithaModal();
   };
 
@@ -100,8 +112,7 @@ export default function PithaModal() {
                     <motion.div
                       key={item.id}
                       whileHover={{ scale: 1.02 }}
-                      className="bg-white rounded-2xl border border-[#E8C8C8] overflow-hidden shadow-sm hover:shadow-lg transition-shadow cursor-pointer group flex flex-col justify-between"
-                      onClick={() => handleAddToCart(item)}
+                      className="bg-white rounded-2xl border border-[#E8C8C8] overflow-hidden shadow-sm hover:shadow-lg transition-shadow group flex flex-col justify-between"
                     >
                       <div>
                         <div className="relative aspect-square w-full">
@@ -121,16 +132,38 @@ export default function PithaModal() {
                         </div>
                       </div>
                       <div className="p-5 pt-3">
-                        <div className="flex items-center justify-between mt-1">
-                          <span className="text-xl font-black text-primary shrink-0">
+                        <div className="flex flex-col gap-3 mt-2">
+                          <span className="text-xl font-black text-primary shrink-0 leading-none">
                             ${item.price}.00
                           </span>
-                          <button
-                            className="flex items-center gap-1.5 bg-[#681628] text-white px-3 py-2 rounded-lg font-semibold text-xs hover:bg-[#541523] transition-colors pointer-events-none whitespace-nowrap shrink-0"
-                          >
-                            <Check className="w-3.5 h-3.5" />
-                            Add to Cart
-                          </button>
+                          
+                          <div className="flex items-stretch gap-2.5">
+                            <div className="flex items-center justify-between bg-[#FAF6F0] border border-[#E8C8C8] rounded-xl px-1.5 flex-[0.8]">
+                              <button 
+                                onClick={() => updateQty(item.id, -1)}
+                                className="p-1.5 text-primary hover:text-accent disabled:opacity-50 transition-opacity"
+                                disabled={getQty(item.id) <= 1}
+                              >
+                                <Minus className="w-3.5 h-3.5" />
+                              </button>
+                              <span className="text-sm font-bold text-center text-primary-deep font-cinzel select-none">
+                                {getQty(item.id)}
+                              </span>
+                              <button 
+                                onClick={() => updateQty(item.id, 1)}
+                                className="p-1.5 text-primary hover:text-accent transition-colors"
+                              >
+                                <Plus className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                            <button
+                              onClick={() => handleAddToCart(item, getQty(item.id))}
+                              className="flex items-center justify-center gap-1.5 bg-[#681628] text-white px-4 py-2.5 rounded-xl font-bold text-xs hover:bg-[#541523] transition-colors flex-[1.2] shadow-sm"
+                            >
+                              <Check className="w-3.5 h-3.5" />
+                              Add
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </motion.div>

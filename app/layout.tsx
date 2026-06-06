@@ -22,6 +22,41 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   title: "Murad Sweets | Handcrafted Bangladeshi Sweets (Mithai) in USA",
   description: "Experience the premium taste of authentic, home-cooked Bangladeshi sweets. Order custom mix-and-match dry sweet boxes, rasmalai cake, specialty doi, party trays, and traditional winter pitha.",
+  keywords: [
+    "Bangladeshi sweets",
+    "Mithai USA",
+    "Halal sweets",
+    "Rasmalai cake",
+    "Custom sweet boxes",
+    "Desi sweets",
+    "Traditional Pitha",
+    "Mishti",
+    "Bengali Sweets"
+  ],
+  openGraph: {
+    title: "Murad Sweets | Bangladeshi Sweets & Custom Mithai Boxes",
+    description: "Premium, authentic home-cooked Bangladeshi sweets. Specializing in mix-and-match boxes, rasmalai cake, and traditional pitha.",
+    url: "https://muradsweets.com",
+    siteName: "Murad Sweets",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Murad Sweets | Premium Bangladeshi Mithai",
+    description: "Authentic, handcrafted Bangladeshi sweets. Order custom mix-and-match boxes today.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
 };
 
 export default function RootLayout({
