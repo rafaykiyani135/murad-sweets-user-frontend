@@ -35,8 +35,8 @@ export default function CartPage() {
             Build your personalized box of traditional sweets or choose from our specialty items to get started!
           </p>
         </div>
-        <Link 
-          href="/products" 
+        <Link
+          href="/menu"
           className="inline-flex btn-gold py-3 px-8 text-xs uppercase tracking-widest text-white shadow-md"
         >
           Browse Products
@@ -85,7 +85,7 @@ export default function CartPage() {
                   <h3 className="font-cinzel text-sm sm:text-base text-primary-deep font-bold leading-tight">
                     {item.name}
                   </h3>
-                  
+
                   {item.unit && (
                     <p className="text-xs text-brown font-body font-semibold">
                       {item.unit}
@@ -210,10 +210,10 @@ export default function CartPage() {
               <ArrowRight className="h-4 w-4 text-accent" />
             </button>
           </div>
-          
+
           <div className="text-center">
-            <Link 
-              href="/products" 
+            <Link
+              href="/menu"
               className="text-[11px] text-brown hover:text-primary font-semibold font-body"
             >
               &larr; Continue Shopping

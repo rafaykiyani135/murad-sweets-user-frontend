@@ -81,7 +81,7 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/products" className="hover:text-accent hover:underline transition-all">
+                <Link href="/menu" className="hover:text-accent hover:underline transition-all">
                   Browse Sweets
                 </Link>
               </li>

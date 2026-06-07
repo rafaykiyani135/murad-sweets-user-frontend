@@ -63,7 +63,8 @@ interface CartState {
   closeMixMatch: () => void;
   isCollectionModalOpen: boolean;
   collectionCategory: Product['category'] | null;
-  openCollectionModal: (category: Product['category']) => void;
+  collectionSize?: 3 | 6 | 9 | null;
+  openCollectionModal: (category: Product['category'], size?: 3 | 6 | 9) => void;
   closeCollectionModal: () => void;
   isPartyTrayModalOpen: boolean;
   openPartyTrayModal: () => void;
@@ -114,6 +115,7 @@ export const useCartStore = create<CartState>()(
       mixMatchProduct: null,
       isCollectionModalOpen: false,
       collectionCategory: null,
+      collectionSize: null,
       isPartyTrayModalOpen: false,
       isSpecialtyModalOpen: false,
       isPithaModalOpen: false,
@@ -184,8 +186,8 @@ export const useCartStore = create<CartState>()(
       setCartOpen: (open) => set({ isCartOpen: open }),
       openMixMatch: (product) => set({ isMixMatchOpen: true, mixMatchProduct: product }),
       closeMixMatch: () => set({ isMixMatchOpen: false, mixMatchProduct: null }),
-      openCollectionModal: (category) => set({ isCollectionModalOpen: true, collectionCategory: category }),
-      closeCollectionModal: () => set({ isCollectionModalOpen: false, collectionCategory: null }),
+      openCollectionModal: (category, size) => set({ isCollectionModalOpen: true, collectionCategory: category, collectionSize: size || null }),
+      closeCollectionModal: () => set({ isCollectionModalOpen: false, collectionCategory: null, collectionSize: null }),
       openPartyTrayModal: () => set({ isPartyTrayModalOpen: true }),
       closePartyTrayModal: () => set({ isPartyTrayModalOpen: false }),
       openSpecialtyModal: () => set({ isSpecialtyModalOpen: true }),

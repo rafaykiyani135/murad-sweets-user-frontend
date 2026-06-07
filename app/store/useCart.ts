@@ -17,6 +17,7 @@ export function useCart() {
       mixMatchProduct: null,
       isCollectionModalOpen: false,
       collectionCategory: null,
+      collectionSize: null,
       isPartyTrayModalOpen: false,
       toasts: [],
       fulfillment: 'pickup' as const,

@@ -45,7 +45,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   return (
     <Link
-      href={`/products/${product.slug}`}
+      href={`/menu/${product.slug}`}
       className={`group relative premium-card flex flex-col h-full overflow-hidden ${!product.inStock ? 'opacity-70' : ''
         }`}
     >
@@ -126,8 +126,8 @@ export default function ProductCard({ product }: ProductCardProps) {
             onClick={handleAddToCart}
             disabled={!product.inStock}
             className={`p-2.5 rounded-full flex items-center justify-center transition-all duration-200 ${!product.inStock
-                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                : 'bg-primary text-white hover:bg-accent hover:text-primary-deep shadow-sm'
+              ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+              : 'bg-primary text-white hover:bg-accent hover:text-primary-deep shadow-sm'
               }`}
             aria-label={product.category === 'dry-sweets' ? 'Select options' : 'Add to cart'}
           >

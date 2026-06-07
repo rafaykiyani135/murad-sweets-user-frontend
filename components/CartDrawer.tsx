@@ -27,7 +27,7 @@ export default function CartDrawer() {
 
   const handleBrowseClick = () => {
     setCartOpen(false);
-    router.push('/products');
+    router.push('/menu');
   };
 
   return (

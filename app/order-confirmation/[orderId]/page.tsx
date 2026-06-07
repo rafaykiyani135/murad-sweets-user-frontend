@@ -285,7 +285,7 @@ export default function OrderConfirmationPage() {
 
       {/* CTA Bottom */}
       <div className="text-center">
-        <Link href="/products" className="btn-gold py-3 px-8 text-xs uppercase tracking-widest inline-block shadow-md">
+        <Link href="/menu" className="btn-gold py-3 px-8 text-xs uppercase tracking-widest inline-block shadow-md">
           Continue Shopping
         </Link>
       </div>

@@ -47,10 +47,11 @@ export default function CollectionModal() {
     closeCollectionModal,
     addToCart,
     addToast,
+    collectionSize,
   } = useCart();
 
-  const [boxSize, setBoxSize] = useState<AssortedBoxSize>(3);
-  const [boxPrice, setBoxPrice] = useState<number>(ASSORTED_BOX_PRICES[3]);
+  const [boxSize, setBoxSize] = useState<AssortedBoxSize>(collectionSize ?? 3);
+  const [boxPrice, setBoxPrice] = useState<number>(ASSORTED_BOX_PRICES[collectionSize ?? 3]);
   const [boxItems, setBoxItems] = useState<BoxSweet[]>([]);
 
   const category = collectionCategory ?? 'dry-sweets';
@@ -61,10 +62,10 @@ export default function CollectionModal() {
   );
 
   const resetBuilder = useCallback(() => {
-    setBoxSize(3);
-    setBoxPrice(ASSORTED_BOX_PRICES[3]);
+    setBoxSize(collectionSize ?? 3);
+    setBoxPrice(ASSORTED_BOX_PRICES[collectionSize ?? 3]);
     setBoxItems([]);
-  }, []);
+  }, [collectionSize]);
 
   useEffect(() => {
     if (isCollectionModalOpen) {
@@ -173,6 +174,7 @@ export default function CollectionModal() {
                   {/* Left column — box configurator */}
                   <div className="lg:col-span-7 space-y-6">
                     {/* Step 1: Box size */}
+                    {!collectionSize && (
                     <div>
                       <h3 className="font-subheading text-xs uppercase tracking-wider text-primary-deep font-semibold mb-4">
                         1. Choose Box Size
@@ -212,12 +214,13 @@ export default function CollectionModal() {
                         })}
                       </div>
                     </div>
+                    )}
 
                     {/* Step 2: Virtual box preview */}
                     <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-sm">
                       <div className="flex items-center justify-between mb-5">
                         <h3 className="font-subheading text-sm font-bold text-[#1A1A1A]">
-                          2. Your Assorted Box
+                          {collectionSize ? '1.' : '2.'} Your Assorted Box
                         </h3>
                         <button
                           type="button"
@@ -296,7 +299,7 @@ export default function CollectionModal() {
                   <div className="lg:col-span-5">
                     <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-sm flex flex-col">
                       <h3 className="font-subheading text-xs uppercase tracking-wider text-primary-deep font-semibold mb-5">
-                        3. Pick Your Sweets
+                        {collectionSize ? '2.' : '3.'} Pick Your Sweets
                       </h3>
 
                       <div className="max-h-[450px] overflow-y-auto pr-2 space-y-3 flex-1">

@@ -42,7 +42,7 @@ export default function ProductDetailPage() {
         <p className="text-sm text-brown font-body">
           We couldn&apos;t find the traditional sweet you are looking for. It may have been renamed or removed.
         </p>
-        <Link href="/products" className="inline-flex btn-gold py-2 px-6 text-xs uppercase tracking-widest">
+        <Link href="/menu" className="inline-flex btn-gold py-2 px-6 text-xs uppercase tracking-widest">
           Back to Catalog
         </Link>
       </div>

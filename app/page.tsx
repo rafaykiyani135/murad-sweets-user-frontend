@@ -78,11 +78,11 @@ export default function Home() {
               transition={{ duration: 0.6, delay: 0.3 }}
               className="flex flex-col sm:flex-row items-start sm:items-center gap-4 pt-2"
             >
-              <Link href="/products" className="w-full sm:w-auto px-8 py-3.5 text-xs uppercase tracking-widest text-cream shadow-lg bg-primary-deep border border-primary-deep hover:bg-primary transition-colors duration-300 flex items-center justify-center rounded-md font-subheading">
+              <Link href="/menu" className="w-full sm:w-auto px-8 py-3.5 text-xs uppercase tracking-widest text-cream shadow-lg bg-primary-deep border border-primary-deep hover:bg-primary transition-colors duration-300 flex items-center justify-center rounded-md font-subheading">
                 <span>Order Now</span>
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Link>
-              <Link href="/products" className="w-full sm:w-auto px-8 py-3.5 text-xs uppercase tracking-widest text-primary-deep font-subheading border border-primary-deep hover:bg-primary-deep hover:text-cream transition-all duration-300 flex items-center justify-center rounded-md">
+              <Link href="/menu" className="w-full sm:w-auto px-8 py-3.5 text-xs uppercase tracking-widest text-primary-deep font-subheading border border-primary-deep hover:bg-primary-deep hover:text-cream transition-all duration-300 flex items-center justify-center rounded-md">
                 Explore Sweets
               </Link>
             </motion.div>

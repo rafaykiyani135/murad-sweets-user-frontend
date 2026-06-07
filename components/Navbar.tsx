@@ -31,7 +31,7 @@ export default function Navbar() {
 
   const navLinks = [
     { name: 'Home', path: '/' },
-    { name: 'Products', path: '/products' },
+    { name: 'Menu', path: '/menu' },
     { name: 'About', path: '/#about' }, // anchors to section on homepage
     { name: 'Contact', path: '/contact' },
   ];

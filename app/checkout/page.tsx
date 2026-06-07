@@ -139,11 +139,11 @@ export default function CheckoutPage() {
   // Form Submit (Final Place Order)
   const onSubmit = async (data: CheckoutFormValues) => {
     setIsSubmitting(true);
-    
+
     // Simulate placing order
     setTimeout(() => {
       const orderId = `MS-${Math.floor(100000 + Math.random() * 900000)}`;
-      
+
       // Save order details to local storage so confirmation page can display them
       const orderDetails = {
         orderId,
@@ -170,7 +170,7 @@ export default function CheckoutPage() {
       };
 
       localStorage.setItem('murad_sweets_last_order', JSON.stringify(orderDetails));
-      
+
       // Clear cart
       clearCart();
       setIsSubmitting(false);
@@ -184,7 +184,7 @@ export default function CheckoutPage() {
       <div className="max-w-xl mx-auto px-4 py-24 text-center space-y-6">
         <ShoppingBag className="h-12 w-12 text-primary mx-auto" />
         <h2 className="font-heading text-xl text-primary-deep font-bold">Your Cart is Empty</h2>
-        <button onClick={() => router.push('/products')} className="btn-gold py-2 px-6 text-xs uppercase tracking-widest">
+        <button onClick={() => router.push('/menu')} className="btn-gold py-2 px-6 text-xs uppercase tracking-widest">
           Browse Products
         </button>
       </div>
@@ -204,7 +204,7 @@ export default function CheckoutPage() {
         <div className="flex items-center justify-between relative">
           {/* Connector Line */}
           <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-0.5 bg-border -z-10" />
-          <div 
+          <div
             className="absolute left-0 top-1/2 -translate-y-1/2 h-0.5 bg-primary transition-all duration-350 -z-10"
             style={{ width: `${((step - 1) / 2) * 100}%` }}
           />
@@ -218,14 +218,13 @@ export default function CheckoutPage() {
             const isActive = step === s.stepNum;
             return (
               <div key={s.stepNum} className="flex flex-col items-center space-y-2">
-                <div 
-                  className={`w-8 h-8 rounded-full flex items-center justify-center font-cinzel text-xs font-bold border-2 transition-all duration-300 ${
-                    isCompleted 
-                      ? 'bg-primary border-primary text-white' 
-                      : isActive 
-                      ? 'bg-cream border-primary text-primary' 
-                      : 'bg-white border-border text-brown'
-                  }`}
+                <div
+                  className={`w-8 h-8 rounded-full flex items-center justify-center font-cinzel text-xs font-bold border-2 transition-all duration-300 ${isCompleted
+                      ? 'bg-primary border-primary text-white'
+                      : isActive
+                        ? 'bg-cream border-primary text-primary'
+                        : 'bg-white border-border text-brown'
+                    }`}
                 >
                   {isCompleted ? <Check className="h-4 w-4" /> : s.stepNum}
                 </div>
@@ -258,11 +257,10 @@ export default function CheckoutPage() {
                       setValue('fulfillment', 'pickup');
                       setFulfillmentType('pickup');
                     }}
-                    className={`py-3 text-xs font-cinzel uppercase font-semibold rounded-md flex items-center justify-center space-x-2 transition-all ${
-                      watchedFulfillment === 'pickup'
+                    className={`py-3 text-xs font-cinzel uppercase font-semibold rounded-md flex items-center justify-center space-x-2 transition-all ${watchedFulfillment === 'pickup'
                         ? 'bg-primary text-cream shadow-sm'
                         : 'text-primary hover:bg-cream/70'
-                    }`}
+                      }`}
                   >
                     <MapPin className="h-4 w-4" />
                     <span>Contactless Pickup</span>
@@ -273,11 +271,10 @@ export default function CheckoutPage() {
                       setValue('fulfillment', 'delivery');
                       setFulfillmentType('delivery');
                     }}
-                    className={`py-3 text-xs font-cinzel uppercase font-semibold rounded-md flex items-center justify-center space-x-2 transition-all ${
-                      watchedFulfillment === 'delivery'
+                    className={`py-3 text-xs font-cinzel uppercase font-semibold rounded-md flex items-center justify-center space-x-2 transition-all ${watchedFulfillment === 'delivery'
                         ? 'bg-primary text-cream shadow-sm'
                         : 'text-primary hover:bg-cream/70'
-                    }`}
+                      }`}
                   >
                     <Truck className="h-4 w-4" />
                     <span>Local Delivery</span>
@@ -450,11 +447,10 @@ export default function CheckoutPage() {
                   <button
                     type="button"
                     onClick={() => setValue('paymentMethod', 'cod')}
-                    className={`py-3 text-xs font-cinzel uppercase font-semibold rounded-md flex items-center justify-center space-x-2 transition-all ${
-                      watchedPayment === 'cod'
+                    className={`py-3 text-xs font-cinzel uppercase font-semibold rounded-md flex items-center justify-center space-x-2 transition-all ${watchedPayment === 'cod'
                         ? 'bg-primary text-cream shadow-sm'
                         : 'text-primary hover:bg-cream/70'
-                    }`}
+                      }`}
                   >
                     <DollarSign className="h-4 w-4" />
                     <span>Cash on Delivery (COD)</span>
@@ -462,11 +458,10 @@ export default function CheckoutPage() {
                   <button
                     type="button"
                     onClick={() => setValue('paymentMethod', 'card')}
-                    className={`py-3 text-xs font-cinzel uppercase font-semibold rounded-md flex items-center justify-center space-x-2 transition-all ${
-                      watchedPayment === 'card'
+                    className={`py-3 text-xs font-cinzel uppercase font-semibold rounded-md flex items-center justify-center space-x-2 transition-all ${watchedPayment === 'card'
                         ? 'bg-primary text-cream shadow-sm'
                         : 'text-primary hover:bg-cream/70'
-                    }`}
+                      }`}
                   >
                     <CreditCard className="h-4 w-4" />
                     <span>Credit / Debit Card</span>
@@ -594,9 +589,8 @@ export default function CheckoutPage() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className={`btn-gold py-3 px-8 text-xs uppercase tracking-widest flex items-center space-x-2 ${
-                    isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
-                  }`}
+                  className={`btn-gold py-3 px-8 text-xs uppercase tracking-widest flex items-center space-x-2 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
+                    }`}
                 >
                   <span>{isSubmitting ? 'Processing Order...' : 'Place Order'}</span>
                   {!isSubmitting && <ArrowRight className="h-4 w-4 text-accent" />}
@@ -633,7 +627,7 @@ export default function CheckoutPage() {
               <span className="text-brown">Subtotal</span>
               <span className="font-cinzel font-bold text-primary-deep">${subtotal.toFixed(2)}</span>
             </div>
-            
+
             <div className="flex justify-between items-center">
               <span className="text-brown">Fulfillment ({watchedFulfillment})</span>
               <span className="font-cinzel font-bold text-primary-deep capitalize">
