@@ -22,7 +22,7 @@ export const PRODUCTS: Product[] = [
     category: 'dry-sweets',
     description: 'Traditional deep-fried milk-solid dumplings soaked in cardamom-infused sugar syrup, featuring a dark, caramelized outer layer.',
     price: 0,
-    images: ['/KaloJam.webp'],
+    images: ['/KaloJam.png'],
     inStock: true,
     isMixMatch: true
   },
@@ -33,7 +33,7 @@ export const PRODUCTS: Product[] = [
     category: 'dry-sweets',
     description: 'Classic Bangladeshi oval-shaped sweet made of dense chenna (curdled milk), slowly cooked to a rich mahogany brown color.',
     price: 0,
-    images: ['/BrownChomChom.webp'],
+    images: ['/BrownChomChom.png'],
     inStock: true,
     isMixMatch: true
   },
@@ -44,7 +44,7 @@ export const PRODUCTS: Product[] = [
     category: 'dry-sweets',
     description: 'Delicate, ivory-white chom chom made of soft chenna, simmered in light sugar syrup, offering a moist texture.',
     price: 0,
-    images: ['/WhiteChomChom.webp'],
+    images: ['/WhiteChomChom.png'],
     inStock: true,
     isMixMatch: true
   },
@@ -55,7 +55,7 @@ export const PRODUCTS: Product[] = [
     category: 'dry-sweets',
     description: 'An elegant variation of Kalojam, sliced open and filled with a thick layer of sweetened cream (malai).',
     price: 0,
-    images: ['/KalujamSandwich.webp'],
+    images: ['/KalujamSandwich.png'],
     inStock: true,
     isMixMatch: true
   },
@@ -66,7 +66,7 @@ export const PRODUCTS: Product[] = [
     category: 'dry-sweets',
     description: 'A honeycomb-shaped royal delight made with chenna, soaked in saffron syrup, and covered with creamy kheer.',
     price: 0,
-    images: ['/KheerMouchak.webp'],
+    images: ['/KheerMouchak.png'],
     inStock: true,
     isMixMatch: true
   },
@@ -77,7 +77,7 @@ export const PRODUCTS: Product[] = [
     category: 'dry-sweets',
     description: 'Plump chenna rounds cooked in syrup and then coated with a luscious, rich saffron malai reduction.',
     price: 0,
-    images: ['/MalaiKari.webp'],
+    images: ['/MalaiKari.png'],
     inStock: true,
     isMixMatch: true
   },
@@ -88,7 +88,7 @@ export const PRODUCTS: Product[] = [
     category: 'dry-sweets',
     description: 'Grand-sized chenna spheres stuffed with dry fruits, simmered in a fragrant saffron and cardamom syrup.',
     price: 0,
-    images: ['/RajBhog.webp'],
+    images: ['/RajBhog.png'],
     inStock: true,
     isMixMatch: true
   },
@@ -99,7 +99,7 @@ export const PRODUCTS: Product[] = [
     category: 'dry-sweets',
     description: 'An artisanal Bangladeshi sweet consisting of small chenna balls cooked in premium date jaggery syrup.',
     price: 0,
-    images: ['/KatariBhog.webp'],
+    images: ['/KatariBhog.png'],
     inStock: true,
     isMixMatch: true
   },
@@ -110,7 +110,7 @@ export const PRODUCTS: Product[] = [
     category: 'dry-sweets',
     description: 'Aromatic Motichoor Laddus made from tiny chickpea flour globules fried in pure ghee.',
     price: 0,
-    images: ['/Laddu.webp'],
+    images: ['/Laddu.png'],
     inStock: true,
     isMixMatch: true
   },
@@ -121,7 +121,7 @@ export const PRODUCTS: Product[] = [
     category: 'dry-sweets',
     description: 'Traditional dry sweet made from fresh paneer and date molasses (Nolen Gur).',
     price: 0,
-    images: ['/Shandesh.webp'],
+    images: ['/Shandesh.png'],
     inStock: true,
     isMixMatch: true
   },
@@ -143,7 +143,7 @@ export const PRODUCTS: Product[] = [
     category: 'dry-sweets',
     description: 'Rich, semi-soft sweet made of condensed milk, sugar, and traditional flavorings.',
     price: 0,
-    images: ['/Peda.webp'],
+    images: ['/Peda.png'],
     inStock: true,
     isMixMatch: true
   },
@@ -166,7 +166,7 @@ export const PRODUCTS: Product[] = [
     description: 'Soft, golden-brown dumplings made of milk solids, deep-fried and soaked in a warm, fragrant sugar syrup with rosewater and cardamom.',
     price: 6,
     unit: 'per box (4pc)',
-    images: ['/GulabJamun.webp'],
+    images: ['/GulabJamun.png'],
     inStock: true
   },
   {
@@ -188,7 +188,7 @@ export const PRODUCTS: Product[] = [
     description: 'A beautiful arrangement of 15-18 assorted premium dry sweets, perfect for family get-togethers and intimate celebrations.',
     price: 30,
     unit: 'per tray (~18 pcs)',
-    images: ['/SmallPartyTray.webp'],
+    images: ['/SmallPartyTray.png'],
     inStock: true
   },
   {
@@ -199,7 +199,7 @@ export const PRODUCTS: Product[] = [
     description: 'A grand presentation tray with 35-40 pieces of our finest sweets, featuring an assortment of chom chom, kalojam, shandesh, and laddus.',
     price: 60,
     unit: 'per tray (~40 pcs)',
-    images: ['/LargePartyTray.webp'],
+    images: ['/LargePartyTray.png'],
     inStock: true
   },
   {

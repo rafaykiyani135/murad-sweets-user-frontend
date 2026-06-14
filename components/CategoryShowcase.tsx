@@ -11,7 +11,7 @@ const items = [
     description: 'A classic rich and caramelized Bengali sweet, deeply satisfying and soaked in sweet syrup.',
     features: [],
     iconImage: '/Icons/IconRowTwo.png',
-    image: '/BrownChomChom.webp',
+    image: '/BrownChomChom.png',
     type: 'image-row'
   },
   {
@@ -20,7 +20,7 @@ const items = [
     description: 'Soft, spongy, and delicately sweet, these traditional white treats are a timeless favorite.',
     features: [],
     iconImage: '/Icons/IconRowThree.png',
-    image: '/WhiteChomChom.webp',
+    image: '/WhiteChomChom.png',
     type: 'image-row'
   },
   {
@@ -29,7 +29,7 @@ const items = [
     description: 'Deep-fried to a beautiful dark color, our KaloJam offers a rich, dense texture bursting with flavor.',
     features: [],
     iconImage: '/Icons/IconRow4.png',
-    image: '/KaloJam.webp',
+    image: '/KaloJam.png',
     type: 'image-row'
   },
   {
@@ -38,7 +38,7 @@ const items = [
     description: 'A majestic, saffron-infused spongy sweet filled with premium nuts and cardamom.',
     features: [],
     iconImage: '/Icons/IconRowOne.png',
-    image: '/RajBhog.webp',
+    image: '/RajBhog.png',
     type: 'image-row'
   },
   {
@@ -47,7 +47,7 @@ const items = [
     description: 'An elegant presentation of classic Kala Jamun, beautifully layered with rich malai cream.',
     features: [],
     iconImage: '/Icons/IconRowTwo.png',
-    image: '/KalujamSandwich.webp',
+    image: '/KalujamSandwich.png',
     type: 'image-row'
   },
   {
@@ -56,7 +56,7 @@ const items = [
     description: 'Perfectly round and irresistibly sweet, our laddus melt in your mouth with every bite.',
     features: [],
     iconImage: '/Icons/IconRowThree.png',
-    image: '/Laddu.webp',
+    image: '/Laddu.png',
     type: 'image-row'
   },
   {
@@ -65,7 +65,7 @@ const items = [
     description: 'A premium regional delicacy known for its unique texture and authentic, rich taste.',
     features: [],
     iconImage: '/Icons/IconRow4.png',
-    image: '/KatariBhog.webp',
+    image: '/KatariBhog.png',
     type: 'image-row'
   },
   {
@@ -74,7 +74,7 @@ const items = [
     description: 'Luxuriously soft sweets drenched in a thickened, sweetened milk infused with cardamom.',
     features: [],
     iconImage: '/Icons/IconRowOne.png',
-    image: '/MalaiKari.webp',
+    image: '/MalaiKari.png',
     type: 'image-row'
   },
   {
@@ -83,7 +83,7 @@ const items = [
     description: 'A delicate milk-based sweet, perfectly balanced and adorned with a touch of tradition.',
     features: [],
     iconImage: '/Icons/IconRowTwo.png',
-    image: '/Shandesh.webp',
+    image: '/Shandesh.png',
     type: 'image-row'
   },
   {
@@ -92,7 +92,7 @@ const items = [
     description: 'Golden, soft, and warm, soaking in a fragrant rose and cardamom syrup.',
     features: [],
     iconImage: '/Icons/IconRowThree.png',
-    image: '/GulabJamun.webp',
+    image: '/GulabJamun.png',
     type: 'image-row'
   }
 ];
@@ -180,24 +180,7 @@ export default function CategoryShowcase() {
   const showcaseItems = items;
 
   return (
-    <section className="bg-[#4A0F17] pt-20 overflow-hidden">
-      <header className="max-w-[1600px] mx-auto text-center mb-16 flex flex-col items-center px-4">
-        <svg className="w-6 h-6 text-accent mb-4" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 2C12 2 15 7 15 12C15 17 12 22 12 22C12 22 9 17 9 12C9 7 12 2 12 2Z" />
-          <path d="M22 12C22 12 17 15 12 15C7 15 2 12 2 12C2 12 7 9 12 9C17 9 22 12 22 12Z" />
-        </svg>
-        <h2 className="text-5xl md:text-6xl lg:text-7xl font-serif font-bold text-cream mb-4">
-          Our Sweet<br />Collections
-        </h2>
-        <svg className="w-6 h-6 text-accent mt-2 rotate-180" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 2C12 2 15 7 15 12C15 17 12 22 12 22C12 22 9 17 9 12C9 7 12 2 12 2Z" />
-          <path d="M22 12C22 12 17 15 12 15C7 15 2 12 2 12C2 12 7 9 12 9C17 9 22 12 22 12Z" />
-        </svg>
-        <p className="mt-8 text-cream/80 text-lg md:text-xl font-medium max-w-2xl mx-auto leading-relaxed">
-          Handcrafted with tradition, made fresh with premium ingredients, and shared with love.
-        </p>
-      </header>
-
+    <section className="overflow-hidden">
       <div className="flex flex-col w-full">
         {showcaseItems.map((item, index) => {
           const imageLeft = index % 2 === 1; // Alternating layout
