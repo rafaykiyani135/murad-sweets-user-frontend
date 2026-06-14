@@ -143,7 +143,10 @@ export default function Footer() {
             className="mb-3 h-[72px] w-[72px] rounded-full border border-accent/40 object-cover shadow-sm"
           />
           <p className="text-[10px] text-cream/50 uppercase tracking-widest font-subheading">
-            &copy; {currentYear} Murad Sweets. All rights reserved. Made with love.
+            &copy; {currentYear} Murad Sweets. All rights reserved.
+          </p>
+          <p className="text-[10px] text-cream/40 uppercase tracking-widest font-subheading mt-1.5">
+            made with ❤️ by <a href="https://acumoai.com" target="_blank" rel="noopener noreferrer" className="hover:text-accent underline transition-colors normal-case">Acumo AI</a>
           </p>
         </div>
       </div>
