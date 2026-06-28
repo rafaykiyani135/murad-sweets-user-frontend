@@ -165,7 +165,7 @@ function CheckoutForm() {
         clientSecret = res.client_secret;
         orderNumber = res.order_number || res.id;
 
-        if (data.paymentMethod === 'card' && clientSecret) {
+        if (data.paymentMethod === 'card' && clientSecret && orderNumber) {
           setPendingPayment({ clientSecret, orderNumber });
         }
       }
