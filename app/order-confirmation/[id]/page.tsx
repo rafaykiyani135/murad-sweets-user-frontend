@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { getOrder } from '@/app/lib/api';
 import { Check, X, Truck, MapPin, Calendar, CreditCard } from 'lucide-react';
+import { useCart } from '@/app/store/useCart';
 
 // ---- Types matching backend OrderOut schema ----
 interface OrderItemOut {
@@ -51,6 +52,7 @@ export default function OrderConfirmationPage() {
   const router = useRouter();
   const params = useParams();
   const id = params?.id as string;
+  const { clearCart } = useCart();
 
   const [order, setOrder] = useState<OrderOut | null>(null);
   const [loading, setLoading] = useState(true);
@@ -63,6 +65,7 @@ export default function OrderConfirmationPage() {
       try {
         const data = await getOrder(id);
         setOrder(data);
+        clearCart();
       } catch (err: any) {
         console.error('Failed to fetch order:', err);
         setError(err.response?.data?.detail || 'Unable to load order details.');

@@ -13,12 +13,6 @@ import { useCart } from '@/app/store/useCart';
 import { useFulfillmentStore } from '@/app/store/fulfillmentStore';
 import { getCartQuote, createOrder } from '@/app/lib/api';
 import Image from 'next/image';
-import { Elements, useStripe, useElements, CardElement } from '@stripe/react-stripe-js';
-import { loadStripe } from '@stripe/stripe-js';
-
-// Make sure to call `loadStripe` outside of a component’s render to avoid
-// recreating the `Stripe` object on every render.
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || 'pk_test_placeholder');
 
 // ─── Validation Schema (simplified — address is now pre-set by fulfillment store) ─
 const checkoutSchema = z.object({
@@ -35,8 +29,6 @@ type CheckoutFormValues = z.infer<typeof checkoutSchema>;
 
 function CheckoutForm() {
   const router = useRouter();
-  const stripe = useStripe();
-  const elements = useElements();
   const { cartItems, getCartSubtotal, clearCart, addToast } = useCart();
 
   // ── Fulfillment store (single source of truth) ──
@@ -58,7 +50,7 @@ function CheckoutForm() {
     tax_cents: number;
     total_cents: number;
   } | null>(null);
-  const [pendingPayment, setPendingPayment] = useState<{ clientSecret: string; orderNumber: string } | null>(null);
+  const [pendingPayment, setPendingPayment] = useState<{ checkoutUrl: string; orderNumber: string } | null>(null);
 
   // ── Computed totals (prefer server quote, fall back to local) ──
   const subtotal = quote ? quote.subtotal_cents / 100 : getCartSubtotal();
@@ -128,9 +120,6 @@ function CheckoutForm() {
       return;
     }
 
-    if (data.paymentMethod === 'card' && !stripe) {
-      return;
-    }
     setIsSubmitting(true);
     try {
       // Build address parts from the fulfillment store's saved address string
@@ -141,11 +130,11 @@ function CheckoutForm() {
       const state = stateZip[0] || '';
       const zip = stateZip[1] || '';
 
-      let clientSecret = pendingPayment?.clientSecret;
+      let checkoutUrl = pendingPayment?.checkoutUrl;
       let orderNumber = pendingPayment?.orderNumber;
 
       // Only create a new order if we haven't already created one for this session
-      if (!clientSecret || !orderNumber) {
+      if (!checkoutUrl || !orderNumber) {
         const res = await createOrder(cartItems, {
           fulfillment: orderType || 'pickup',
           street,
@@ -162,31 +151,18 @@ function CheckoutForm() {
           deliveryFeeCents: orderType === 'delivery' ? deliveryFeeCents || 0 : 0,
         });
 
-        clientSecret = res.client_secret;
+        checkoutUrl = res.checkout_url;
         orderNumber = res.order_number || res.id;
 
-        if (data.paymentMethod === 'card' && clientSecret && orderNumber) {
-          setPendingPayment({ clientSecret, orderNumber });
+        if (data.paymentMethod === 'card' && checkoutUrl && orderNumber) {
+          setPendingPayment({ checkoutUrl, orderNumber });
         }
       }
 
-      if (data.paymentMethod === 'card' && clientSecret) {
-        const cardElement = elements?.getElement(CardElement);
-        if (!cardElement) throw new Error("Stripe not initialized");
-
-        const { error, paymentIntent } = await stripe!.confirmCardPayment(clientSecret, {
-          payment_method: {
-            card: cardElement,
-            billing_details: {
-              name: data.fullName,
-              email: data.email,
-            }
-          }
-        });
-
-        if (error) {
-          throw new Error(error.message); // This throws so we don't redirect, but we keep the pendingPayment state
-        }
+      if (data.paymentMethod === 'card' && checkoutUrl) {
+        // Redirect to Stripe checkout
+        window.location.href = checkoutUrl;
+        return;
       }
 
       // Success
@@ -418,30 +394,15 @@ function CheckoutForm() {
                 </div>
 
                 {watchedPayment === 'card' && (
-                  <div className="p-5 border border-border rounded-xl bg-cream/10 space-y-4">
+                  <div className="p-5 border border-border rounded-xl bg-cream/10 space-y-3">
                     <div className="flex items-center gap-2 border-b border-border pb-2.5">
                       <CreditCard className="h-4 w-4 text-accent" />
-                      <span className="font-cinzel text-[11px] uppercase tracking-wider text-primary-deep font-bold">Stripe Secured Card Information</span>
+                      <span className="font-cinzel text-[11px] uppercase tracking-wider text-primary-deep font-bold">Secure Card Payment</span>
                     </div>
-                    <div className="bg-white border border-border rounded-md p-3.5">
-                      <CardElement
-                        options={{
-                          style: {
-                            base: {
-                              fontSize: '14px',
-                              color: '#342318',
-                              '::placeholder': {
-                                color: '#a89f91',
-                              },
-                              fontFamily: 'Inter, system-ui, sans-serif'
-                            },
-                            invalid: {
-                              color: '#dc2626',
-                            },
-                          },
-                        }}
-                      />
-                    </div>
+                    <p className="text-xs text-brown leading-relaxed font-body">
+                      You will be redirected to the secure **Stripe Checkout** page to enter your credit/debit card details and complete your payment. 
+                      Once paid, you will be automatically returned to our order confirmation page.
+                    </p>
                   </div>
                 )}
 
@@ -532,8 +493,6 @@ function CheckoutForm() {
 
 export default function CheckoutPage() {
   return (
-    <Elements stripe={stripePromise}>
-      <CheckoutForm />
-    </Elements>
+    <CheckoutForm />
   );
 }
