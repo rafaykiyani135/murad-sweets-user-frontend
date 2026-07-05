@@ -323,7 +323,6 @@ function CheckoutForm() {
                     </h3>
                     <p className="text-xs text-primary-deep leading-relaxed font-body">
                       <strong>Murad Sweets:</strong> 11920 S Texas 6, Unit 1280, Sugar Land, TX 77498<br />
-                      Pickup is completely contact-free. Exact instructions will be shared in your confirmation email.
                     </p>
                   </div>
                 )}
@@ -400,8 +399,8 @@ function CheckoutForm() {
                       <span className="font-cinzel text-[11px] uppercase tracking-wider text-primary-deep font-bold">Secure Card Payment</span>
                     </div>
                     <p className="text-xs text-brown leading-relaxed font-body">
-                      You will be redirected to the secure **Stripe Checkout** page to enter your credit/debit card details and complete your payment. 
-                      Once paid, you will be automatically returned to our order confirmation page.
+                      You will be redirected to our secure payment page to complete your payment. Once your payment is successful, you will be automatically returned to the order confirmation page.
+
                     </p>
                   </div>
                 )}

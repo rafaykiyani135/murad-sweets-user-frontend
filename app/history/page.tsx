@@ -37,6 +37,7 @@ interface OrderDetail {
   scheduled_date: string;
   scheduled_slot: string;
   fulfillment_type: string;
+  delivery_address?: string | null;
   created_at: string | null;
   notes: string | null;
   admin_notes: string | null;
@@ -329,7 +330,9 @@ function OrderDetailModal({
           <div style={{ background: '#FFF', padding: '16px', borderRadius: '12px', border: '1px solid #E8C8C8' }}>
             <h4 style={{ margin: '0 0 10px', color: '#7B1E2B', fontSize: '14px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Fulfillment Detail</h4>
             <p style={{ margin: '4px 0', fontSize: '14px', fontWeight: 600, color: '#4A0F17' }}>
-              {order.fulfillment_type === 'delivery' ? '🚗 Local Delivery' : '🏪 In-store Pickup'}
+              {order.fulfillment_type === 'delivery' 
+                ? (order.delivery_address ? `🚗 ${order.delivery_address}` : '🚗 Local Delivery') 
+                : '🏪 In-store Pickup'}
             </p>
             <p style={{ margin: '4px 0', fontSize: '13px', color: '#8A5A2B' }}>📅 {order.scheduled_date}</p>
             <p style={{ margin: '4px 0', fontSize: '13px', color: '#8A5A2B' }}>🕒 {order.scheduled_slot}</p>

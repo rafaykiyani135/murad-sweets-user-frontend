@@ -91,11 +91,11 @@ export default function Footer() {
                   Browse Sweets
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link href="/#about" className="hover:text-accent hover:underline transition-all">
                   Our Story
                 </Link>
-              </li>
+              </li> */}
               <li>
                 <Link href="/contact" className="hover:text-accent hover:underline transition-all">
                   Contact Us
@@ -123,7 +123,7 @@ export default function Footer() {
           </div>
 
           {/* Hours & Fulfillment */}
-          <div>
+          {/* <div>
             <h3 className="font-subheading text-sm text-accent uppercase tracking-wider mb-4">Fulfillment Hours</h3>
             <ul className="space-y-3.5 text-xs text-cream/80 font-body">
               <li className="flex items-start space-x-2.5">
@@ -136,18 +136,12 @@ export default function Footer() {
                 </div>
               </li>
             </ul>
-          </div>
+          </div> */}
         </div>
 
         {/* Ornament divider and Copyright */}
         <div className="border-t border-accent/20 pt-8 mt-8 text-center flex flex-col items-center">
-          <Image
-            src="/murad-logo.jpg"
-            alt="Murad Sweets"
-            width={72}
-            height={72}
-            className="mb-3 h-[72px] w-[72px] rounded-full border border-accent/40 object-cover shadow-sm"
-          />
+
           <p className="text-[10px] text-cream/50 uppercase tracking-widest font-subheading">
             &copy; {currentYear} Murad Sweets. All rights reserved.
           </p>
