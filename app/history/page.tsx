@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { api } from '@/app/lib/api';
 
 // ─── Types ─────────────────────────────────────────────────────────────────
@@ -775,6 +776,11 @@ export default function HistoryPage() {
   // Toast notifications
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
+  // Authentication state
+  const router = useRouter();
+  const [authChecked, setAuthChecked] = useState(false);
+  const [adminEmail, setAdminEmail] = useState('');
+
   const showToast = (message: string, type: 'success' | 'error' = 'success') => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 3500);
@@ -813,7 +819,35 @@ export default function HistoryPage() {
     }
   };
 
-  useEffect(() => { fetchOrders(); fetchStock(); fetchDeliverySettings(); }, []);
+  // Auth guard: check session before loading any data
+  useEffect(() => {
+    api.get('/auth/me')
+      .then(res => {
+        setAdminEmail(res.data.email);
+        setAuthChecked(true);
+      })
+      .catch(() => {
+        router.replace('/login');
+      });
+  }, [router]);
+
+  // Only fetch data after auth is confirmed
+  useEffect(() => {
+    if (authChecked) {
+      fetchOrders();
+      fetchStock();
+      fetchDeliverySettings();
+    }
+  }, [authChecked]);
+
+  const handleLogout = async () => {
+    try {
+      await api.post('/auth/logout');
+    } catch {
+      // ignore
+    }
+    router.replace('/login');
+  };
 
   const fetchCategories = async () => {
     setLoadingProducts(true);
@@ -932,6 +966,23 @@ export default function HistoryPage() {
   };
 
 
+  // Show loading screen while checking auth
+  if (!authChecked) {
+    return (
+      <div style={{
+        minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
+        background: 'var(--color-cream, #FFE9E1)', flexDirection: 'column', gap: '16px',
+      }}>
+        <div style={{
+          width: 40, height: 40, border: '3px solid #E8C8C8', borderTopColor: '#7B1E2B',
+          borderRadius: '50%', animation: 'spin 0.8s linear infinite',
+        }} />
+        <p style={{ color: '#8A5A2B', fontWeight: 600, fontSize: '14px' }}>Loading dashboard...</p>
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      </div>
+    );
+  }
+
   return (
     <div style={{
       minHeight: '100vh',
@@ -967,7 +1018,7 @@ export default function HistoryPage() {
             </h1>
             <p style={{ margin: '2px 0 0', color: '#8A5A2B', fontSize: '13px' }}>Fulfillment and Live Stock Tracking Dashboard</p>
           </div>
-          <div style={{ display: 'flex', gap: '12px' }}>
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
             <button
               onClick={() => setShowAddOrder(true)}
               style={{ 
@@ -994,6 +1045,26 @@ export default function HistoryPage() {
             >
               ↻ Refresh Data
             </button>
+
+            {/* Logout */}
+            <div style={{ borderLeft: '1px solid #E8C8C8', paddingLeft: '12px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <span style={{ fontSize: '12px', color: '#8A5A2B', fontWeight: 600, maxWidth: '120px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {adminEmail}
+              </span>
+              <button
+                id="logout-button"
+                onClick={handleLogout}
+                style={{
+                  padding: '8px 16px', borderRadius: '8px', border: '1px solid #E8C8C8',
+                  background: '#FFF', color: '#991B1B', fontSize: '13px', fontWeight: 600,
+                  cursor: 'pointer', transition: 'all 0.2s',
+                }}
+                onMouseEnter={e => { e.currentTarget.style.background = '#FFF4F4'; e.currentTarget.style.borderColor = '#FECACA'; }}
+                onMouseLeave={e => { e.currentTarget.style.background = '#FFF'; e.currentTarget.style.borderColor = '#E8C8C8'; }}
+              >
+                Sign Out
+              </button>
+            </div>
           </div>
         </div>
       </div>
