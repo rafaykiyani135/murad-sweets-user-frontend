@@ -59,7 +59,7 @@ export const PRODUCTS: Product[] = [
     inStock: true,
     isMixMatch: true
   },
-  /* {
+  {
     id: '5',
     slug: 'kheer-mouchak',
     name: 'Kheer Mouchak',
@@ -69,7 +69,7 @@ export const PRODUCTS: Product[] = [
     images: ['/KheerMouchak.png'],
     inStock: true,
     isMixMatch: true
-  }, */
+  },
   {
     id: '6',
     slug: 'malaikari',
@@ -322,17 +322,17 @@ export const PRODUCTS: Product[] = [
     images: ['https://items-images-production-f.squarecdn.com/files/e165ec6df7b6a9094b2a46d22efc4d107061e1f8/original.jpeg?width=640&crop=1%3A1&format=webp'],
     inStock: true
   },
-  /* {
+  {
     id: '28',
     slug: 'mpp-kheer-mouchak',
     name: 'Kheer Mouchak',
     category: 'mishti-per-pound',
     description: 'Honeycomb-shaped delight made with chenna and covered with creamy reduced milk.',
-    price: 13,
+    price: 12,
     unit: 'per lb',
-    images: ['https://items-images-production-f.squarecdn.com/files/6b5ab94ac6f70f24feba421fb318ef7c9efa9917/original.jpeg?width=640&crop=1%3A1&format=webp'],
+    images: ['/KheerMouchak.png'],
     inStock: true
-  }, */
+  },
   {
     id: '29',
     slug: 'mpp-kala-jamun-sandwich',
@@ -437,7 +437,7 @@ export const SWEET_DISPLAY_META: Record<string, SweetDisplayMeta> = {
   'brown-chom-chom': { color: '#C49A7A', bgClass: 'bg-amber-100', flavorType: 'Chenna' },
   'white-chom-chom': { color: '#F5E6D3', bgClass: 'bg-orange-50', flavorType: 'Chenna' },
   'kalojam-sandwich': { color: '#8E44AD', bgClass: 'bg-violet-100', flavorType: 'Malai' },
-  // 'kheer-mouchak': { color: '#E67E22', bgClass: 'bg-orange-100', flavorType: 'Saffron' },
+  'kheer-mouchak': { color: '#E67E22', bgClass: 'bg-orange-100', flavorType: 'Saffron' },
   malaikari: { color: '#F39C12', bgClass: 'bg-yellow-100', flavorType: 'Malai' },
   rajbhog: { color: '#14B8A6', bgClass: 'bg-teal-100', flavorType: 'Saffron' },
   'kathari-bhog': { color: '#795548', bgClass: 'bg-stone-100', flavorType: 'Jaggery' },
@@ -487,9 +487,9 @@ export const COLLECTION_MODAL_COPY: Record<
 };
 
 export const CATEGORIES = [
-  { id: 'dry-sweets', name: 'Dry Sweets (Mix & Match)', count: 12 },
+  { id: 'dry-sweets', name: 'Dry Sweets (Mix & Match)', count: 13 },
   { id: 'specialty', name: 'Specialty Items', count: 3 },
   { id: 'party-trays', name: 'Party Trays', count: 2 },
   { id: 'pitha', name: 'Traditional Pitha (Pre-Order Only)', count: 3 },
-  { id: 'mishti-per-pound', name: 'Mishti Per Pound', count: 15 }
+  { id: 'mishti-per-pound', name: 'Mishti Per Pound', count: 16 }
 ];

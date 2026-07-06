@@ -187,7 +187,7 @@ export default function CartPage() {
               <div className="p-3 bg-blush/35 rounded-lg border border-border text-[11px] text-brown flex items-start space-x-1.5">
                 <MapPin className="h-4 w-4 text-accent flex-shrink-0 mt-0.5" />
                 <span>
-                  contactless pickup selected at **Houston, Texas 77055** (Free of charge).
+                  contactless pickup selected at **Houston, Texas 77498** (Free of charge).
                 </span>
               </div>
             )}

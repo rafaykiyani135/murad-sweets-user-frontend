@@ -18,6 +18,7 @@ interface OrderSummary {
 }
 
 interface OrderItemDetail {
+  id: string;
   name: string;
   unit_price: number;
   quantity: number;
@@ -90,6 +91,7 @@ interface AdminProduct {
   is_active: boolean;
   is_in_stock: boolean;
   quantity_on_hand: number | null;
+  sort_order: number;
 }
 
 interface AdminCategory {
@@ -198,18 +200,18 @@ function StatusUpdateModal({
       position: 'fixed', inset: 0, backgroundColor: 'rgba(74, 15, 23, 0.4)',
       display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000,
       backdropFilter: 'blur(4px)',
-    }} onClick={onClose}>
+    }} className="p-4" onClick={onClose}>
       <div style={{
-        background: '#FAF6F0', borderRadius: '16px', padding: '32px', width: '100%', maxWidth: '400px',
+        background: '#FAF6F0', borderRadius: '16px', width: '100%', maxWidth: '400px',
         border: '1px solid #E8C8C8', boxShadow: '0 10px 30px rgba(74, 15, 23, 0.15)'
-      }} onClick={e => e.stopPropagation()}>
+      }} className="p-5 sm:p-8" onClick={e => e.stopPropagation()}>
         <h3 style={{ margin: '0 0 16px', color: '#4A0F17', fontSize: '20px', fontFamily: 'var(--font-heading)' }}>Update Status</h3>
         <p style={{ margin: '0 0 16px', color: '#8A5A2B', fontSize: '14px' }}>Order: <strong style={{ color: '#4A0F17' }}>{order.order_number}</strong></p>
         <select
           value={status}
           onChange={e => setStatus(e.target.value)}
-          style={{ 
-            width: '100%', padding: '12px', borderRadius: '8px', marginBottom: '24px', 
+          style={{
+            width: '100%', padding: '12px', borderRadius: '8px', marginBottom: '24px',
             background: '#FFF', color: '#4A0F17', border: '1px solid #E8C8C8',
             fontFamily: 'var(--font-body)', outline: 'none', fontWeight: 600
           }}
@@ -220,13 +222,13 @@ function StatusUpdateModal({
         </select>
         {error && <p style={{ color: '#7B1E2B', fontSize: '13px', marginBottom: '16px' }}>{error}</p>}
         <div style={{ display: 'flex', gap: '12px' }}>
-          <button onClick={onClose} style={{ 
-            flex: 1, padding: '12px', borderRadius: '8px', border: '1px solid #E8C8C8', 
-            background: '#FFF', color: '#8A5A2B', cursor: 'pointer', fontWeight: 600 
+          <button onClick={onClose} style={{
+            flex: 1, padding: '12px', borderRadius: '8px', border: '1px solid #E8C8C8',
+            background: '#FFF', color: '#8A5A2B', cursor: 'pointer', fontWeight: 600
           }}>Cancel</button>
-          <button onClick={handleUpdate} disabled={loading} style={{ 
-            flex: 1, padding: '12px', borderRadius: '8px', border: 'none', 
-            background: '#7B1E2B', color: '#FFF', cursor: 'pointer', fontWeight: 600 
+          <button onClick={handleUpdate} disabled={loading} style={{
+            flex: 1, padding: '12px', borderRadius: '8px', border: 'none',
+            background: '#7B1E2B', color: '#FFF', cursor: 'pointer', fontWeight: 600
           }}>{loading ? 'Saving...' : 'Save'}</button>
         </div>
       </div>
@@ -249,15 +251,42 @@ function OrderDetailModal({
   const [updatingStatus, setUpdatingStatus] = useState(false);
   const [statusError, setStatusError] = useState('');
 
+  const [products, setProducts] = useState<ProductInfo[]>([]);
+  const [editingItemId, setEditingItemId] = useState<string | null>(null);
+  const [editSelections, setEditSelections] = useState<{ name: string; quantity: number }[]>([]);
+  const [savingSelections, setSavingSelections] = useState(false);
+
   const fetchOrderDetails = async () => {
     setLoading(true);
     try {
-      const res = await api.get(`/history/orders/${orderNumber}`);
-      setOrder(res.data);
+      const [orderRes, prodRes] = await Promise.all([
+        api.get(`/history/orders/${orderNumber}`),
+        api.get('/products')
+      ]);
+      setOrder(orderRes.data);
+      setProducts(prodRes.data);
     } catch {
       onClose();
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSaveSelections = async (itemId: string) => {
+    if (!order) return;
+    setSavingSelections(true);
+    try {
+      const payload = { selections: { selectedItems: editSelections } };
+      await api.patch(`/history/orders/${order.order_number}/items/${itemId}/selections`, payload);
+      const newItems = order.items.map(it =>
+        it.id === itemId ? { ...it, selections: payload.selections } : it
+      );
+      setOrder({ ...order, items: newItems });
+      setEditingItemId(null);
+    } catch (e: any) {
+      alert('Failed to save changes: ' + (e?.response?.data?.detail ?? ''));
+    } finally {
+      setSavingSelections(false);
     }
   };
 
@@ -301,12 +330,12 @@ function OrderDetailModal({
       position: 'fixed', inset: 0, backgroundColor: 'rgba(74, 15, 23, 0.4)',
       display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000,
       backdropFilter: 'blur(4px)',
-    }} onClick={onClose}>
+    }} className="p-4" onClick={onClose}>
       <div style={{
-        background: '#FAF6F0', borderRadius: '16px', padding: '32px', width: '100%', maxWidth: '650px', maxHeight: '90vh', overflowY: 'auto',
+        background: '#FAF6F0', borderRadius: '16px', width: '100%', maxWidth: '650px', maxHeight: '90vh', overflowY: 'auto',
         border: '1px solid #E8C8C8', boxShadow: '0 10px 30px rgba(74, 15, 23, 0.15)'
-      }} onClick={e => e.stopPropagation()}>
-        
+      }} className="p-5 sm:p-8" onClick={e => e.stopPropagation()}>
+
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '1px solid #E8C8C8', paddingBottom: '16px', marginBottom: '24px' }}>
           <div>
@@ -326,12 +355,12 @@ function OrderDetailModal({
             <p style={{ margin: '4px 0', fontSize: '13px', color: '#8A5A2B' }}>📞 {order.customer.phone}</p>
             <p style={{ margin: '4px 0', fontSize: '13px', color: '#8A5A2B' }}>✉️ {order.customer.email}</p>
           </div>
-          
+
           <div style={{ background: '#FFF', padding: '16px', borderRadius: '12px', border: '1px solid #E8C8C8' }}>
             <h4 style={{ margin: '0 0 10px', color: '#7B1E2B', fontSize: '14px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Fulfillment Detail</h4>
             <p style={{ margin: '4px 0', fontSize: '14px', fontWeight: 600, color: '#4A0F17' }}>
-              {order.fulfillment_type === 'delivery' 
-                ? (order.delivery_address ? `🚗 ${order.delivery_address}` : '🚗 Local Delivery') 
+              {order.fulfillment_type === 'delivery'
+                ? (order.delivery_address ? `🚗 ${order.delivery_address}` : '🚗 Local Delivery')
                 : '🏪 In-store Pickup'}
             </p>
             <p style={{ margin: '4px 0', fontSize: '13px', color: '#8A5A2B' }}>📅 {order.scheduled_date}</p>
@@ -352,24 +381,78 @@ function OrderDetailModal({
                   </div>
                   <span style={{ fontWeight: 600, color: '#4A0F17' }}>${item.line_total.toFixed(2)}</span>
                 </div>
-                
+
                 {/* Render Custom Box selections if present */}
                 {item.selections?.selectedItems && (
-                  <div style={{ marginTop: '6px', padding: '8px 12px', background: '#FAF6F0', borderRadius: '6px', borderLeft: '3px solid #7B1E2B' }}>
-                    <p style={{ margin: '0 0 4px', fontSize: '12px', fontWeight: 700, color: '#8A5A2B' }}>Box Contents:</p>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '4px' }}>
-                      {item.selections.selectedItems.map((selItem, sIdx) => (
-                        <div key={sIdx} style={{ fontSize: '12px', color: '#4A0F17' }}>
-                          • {selItem.name} <span style={{ fontWeight: 600, color: '#8A5A2B' }}>(x{selItem.quantity})</span>
-                        </div>
-                      ))}
+                  <div style={{ marginTop: '8px', padding: '12px', background: '#FAF6F0', borderRadius: '8px', borderLeft: '3px solid #7B1E2B' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                      <p style={{ margin: 0, fontSize: '13px', fontWeight: 700, color: '#8A5A2B' }}>Box Contents:</p>
+                      {editingItemId !== item.id && (
+                        <button
+                          onClick={() => {
+                            setEditingItemId(item.id);
+                            setEditSelections(JSON.parse(JSON.stringify(item.selections!.selectedItems)));
+                          }}
+                          style={{ padding: '4px 10px', fontSize: '11px', fontWeight: 700, background: '#FFF', border: '1px solid #E8C8C8', borderRadius: '4px', cursor: 'pointer', color: '#7B1E2B' }}
+                        >
+                          Edit Contents
+                        </button>
+                      )}
                     </div>
+
+                    {editingItemId === item.id ? (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        {editSelections.map((selItem, sIdx) => (
+                          <div key={sIdx} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                            <select
+                              value={selItem.name}
+                              onChange={(e) => {
+                                const newSels = [...editSelections];
+                                newSels[sIdx].name = e.target.value;
+                                setEditSelections(newSels);
+                              }}
+                              style={{ flex: 1, padding: '6px', borderRadius: '4px', border: '1px solid #E8C8C8', fontSize: '12px', background: '#FFF' }}
+                            >
+                              <option value={selItem.name}>{selItem.name || 'Select sweet...'}</option>
+                              {products.filter(p => p.product_type !== 'custom_box' && (!editSelections.some(es => es.name === p.name) || p.name === selItem.name)).map(p => (
+                                <option key={p.id} value={p.name}>{p.name}</option>
+                              ))}
+                            </select>
+                            <input
+                              type="number" min={1}
+                              value={selItem.quantity}
+                              onChange={(e) => {
+                                const newSels = [...editSelections];
+                                newSels[sIdx].quantity = parseInt(e.target.value) || 1;
+                                setEditSelections(newSels);
+                              }}
+                              style={{ width: '50px', padding: '6px', borderRadius: '4px', border: '1px solid #E8C8C8', fontSize: '12px', textAlign: 'center' }}
+                            />
+                            <button onClick={() => setEditSelections(editSelections.filter((_, i) => i !== sIdx))} style={{ background: '#FFF4EE', color: '#7B1E2B', border: '1px solid #E8C8C8', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontWeight: 700 }}>X</button>
+                          </div>
+                        ))}
+                        <button onClick={() => setEditSelections([...editSelections, { name: '', quantity: 1 }])} style={{ padding: '6px', border: '1px dashed #E8C8C8', background: 'transparent', cursor: 'pointer', fontSize: '12px', color: '#8A5A2B', fontWeight: 600, marginTop: '4px' }}>+ Add Item</button>
+
+                        <div style={{ display: 'flex', gap: '8px', marginTop: '12px', justifyContent: 'flex-end', borderTop: '1px solid #E8C8C8', paddingTop: '12px' }}>
+                          <button onClick={() => setEditingItemId(null)} style={{ padding: '6px 16px', fontSize: '12px', borderRadius: '6px', border: '1px solid #E8C8C8', background: '#FFF', color: '#8A5A2B', cursor: 'pointer', fontWeight: 600 }}>Cancel</button>
+                          <button onClick={() => handleSaveSelections(item.id)} disabled={savingSelections} style={{ padding: '6px 16px', fontSize: '12px', borderRadius: '6px', border: 'none', background: '#7B1E2B', color: '#FFF', cursor: 'pointer', fontWeight: 700 }}>{savingSelections ? 'Saving...' : 'Save Changes'}</button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-[6px]">
+                        {item.selections.selectedItems.map((selItem, sIdx) => (
+                          <div key={sIdx} style={{ fontSize: '13px', color: '#4A0F17' }}>
+                            • {selItem.name} <span style={{ fontWeight: 600, color: '#8A5A2B' }}>(x{selItem.quantity})</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
             ))}
           </div>
-          
+
           <div style={{ borderTop: '2px solid #FAF6F0', marginTop: '16px', paddingTop: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontWeight: 800, fontSize: '16px', color: '#4A0F17' }}>
             <span>Total Value</span>
             <span style={{ color: '#2E7D32' }}>${order.total.toFixed(2)}</span>
@@ -477,10 +560,12 @@ function AddOrderModal({
       return {
         product_id: item.product_id,
         quantity: item.quantity,
-        selections: prod?.product_type === 'custom_box' ? { selectedItems: item.selections.map(s => {
-          const sw = products.find(p => p.id === s.id);
-          return { name: sw?.name ?? '', quantity: s.quantity };
-        }) } : null
+        selections: prod?.product_type === 'custom_box' ? {
+          selectedItems: item.selections.map(s => {
+            const sw = products.find(p => p.id === s.id);
+            return { name: sw?.name ?? '', quantity: s.quantity };
+          })
+        } : null
       };
     });
 
@@ -498,7 +583,7 @@ function AddOrderModal({
   const drySweets = products.filter(p => p.category_id === categories.find(c => c.slug === 'dry-sweets')?.id);
 
   const inputStyle = {
-    padding: '12px', borderRadius: '8px', background: '#FFF', 
+    padding: '12px', borderRadius: '8px', background: '#FFF',
     color: '#4A0F17', border: '1px solid #E8C8C8', outline: 'none',
     fontFamily: 'var(--font-body)', width: '100%', boxSizing: 'border-box' as const
   };
@@ -508,11 +593,11 @@ function AddOrderModal({
       position: 'fixed', inset: 0, backgroundColor: 'rgba(74, 15, 23, 0.4)',
       display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000,
       backdropFilter: 'blur(4px)',
-    }} onClick={onClose}>
+    }} className="p-4" onClick={onClose}>
       <div style={{
-        background: '#FAF6F0', borderRadius: '16px', padding: '32px', width: '100%', maxWidth: '750px', maxHeight: '90vh', overflowY: 'auto',
+        background: '#FAF6F0', borderRadius: '16px', width: '100%', maxWidth: '750px', maxHeight: '90vh', overflowY: 'auto',
         border: '1px solid #E8C8C8', boxShadow: '0 10px 30px rgba(74, 15, 23, 0.15)'
-      }} onClick={e => e.stopPropagation()}>
+      }} className="p-5 sm:p-8" onClick={e => e.stopPropagation()}>
         <h3 style={{ margin: '0 0 24px', color: '#4A0F17', fontSize: '24px', fontFamily: 'var(--font-heading)' }}>Manually Create Order</h3>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '24px' }}>
@@ -636,7 +721,7 @@ function AddOrderModal({
         <button onClick={() => setItems([...items, { category_id: '', product_id: '', quantity: 1, selections: [] }])} style={{ padding: '12px 20px', borderRadius: '8px', background: '#FFF', color: '#4A0F17', border: '1px dashed #E8C8C8', cursor: 'pointer', marginBottom: '24px', fontWeight: 600, width: '100%' }}>+ Add New Line Item</button>
 
         {error && <div style={{ background: '#FFF4EE', color: '#7B1E2B', padding: '12px', borderRadius: '8px', marginBottom: '16px', border: '1px solid #E8C8C8', fontSize: '14px' }}>{error}</div>}
-        
+
         <div style={{ display: 'flex', gap: '12px' }}>
           <button onClick={onClose} style={{ flex: 1, padding: '14px', borderRadius: '8px', border: '1px solid #E8C8C8', background: '#FFF', color: '#8A5A2B', cursor: 'pointer', fontWeight: 600 }}>Cancel</button>
           <button onClick={handleCreate} disabled={loading} style={{ flex: 1, padding: '14px', borderRadius: '8px', border: 'none', background: '#7B1E2B', color: '#FFF', cursor: 'pointer', fontWeight: 600 }}>{loading ? 'Creating Order...' : 'Confirm & Create Order'}</button>
@@ -730,12 +815,12 @@ function EditProductRow({ prod, categories, onSave, onCancel }: { prod: any; cat
         <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: '#4A0F17', fontWeight: 600, cursor: 'pointer' }}><input type="checkbox" checked={isInStock} onChange={e => setIsInStock(e.target.checked)} /> In Stock</label>
         <div style={{ marginLeft: 'auto', display: 'flex', gap: '8px' }}>
           <button onClick={onCancel} style={{ padding: '8px 14px', borderRadius: '6px', border: '1px solid #E8C8C8', background: '#FFF', color: '#8A5A2B', cursor: 'pointer' }}>Cancel</button>
-          <button disabled={saving} onClick={async () => { 
-            setSaving(true); 
+          <button disabled={saving} onClick={async () => {
+            setSaving(true);
             const updates: any = { name, description, base_price_cents: Math.round(parseFloat(price) * 100), unit_label: unitLabel || null, is_active: isActive, is_in_stock: isInStock };
             if (categoryId && categoryId !== prod.category_id) updates.category_id = categoryId;
-            await onSave(updates); 
-            setSaving(false); 
+            await onSave(updates);
+            setSaving(false);
           }} style={{ padding: '8px 20px', borderRadius: '6px', border: 'none', background: '#7B1E2B', color: '#FFF', fontWeight: 700, cursor: 'pointer' }}>{saving ? 'Saving...' : 'Save Changes'}</button>
         </div>
       </div>
@@ -752,7 +837,7 @@ export default function HistoryPage() {
   const [loadingStock, setLoadingStock] = useState(true);
   const [activeTab, setActiveTab] = useState<'orders' | 'stock' | 'delivery' | 'products'>('orders');
   const [orderFilter, setOrderFilter] = useState('all');
-  
+
   // Search & Sorting States
   const [orderQuery, setOrderQuery] = useState('');
   const [stockQuery, setStockQuery] = useState('');
@@ -775,7 +860,7 @@ export default function HistoryPage() {
   const [editingCategory, setEditingCategory] = useState<AdminCategory | null>(null);
   const [showAddCategory, setShowAddCategory] = useState(false);
   const [showAddProduct, setShowAddProduct] = useState<string | null>(null); // holds category_id
-  
+
   // Toast notifications
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
@@ -886,6 +971,39 @@ export default function HistoryPage() {
     }
   };
 
+  const handleReorderCategories = async (catId: string, direction: 'up' | 'down') => {
+    const idx = categories.findIndex(c => c.id === catId);
+    if ((direction === 'up' && idx === 0) || (direction === 'down' && idx === categories.length - 1)) return;
+    const newList = [...categories];
+    const swapIdx = direction === 'up' ? idx - 1 : idx + 1;
+    [newList[idx], newList[swapIdx]] = [newList[swapIdx], newList[idx]];
+    setCategories(newList);
+    try {
+      await api.post('/admin/products/categories/reorder', { ordered_ids: newList.map(c => c.id) });
+    } catch {
+      showToast('Failed to save category order.', 'error');
+      fetchCategories();
+    }
+  };
+
+  const handleReorderProducts = async (catId: string, prodId: string, direction: 'up' | 'down') => {
+    const cat = categories.find(c => c.id === catId);
+    if (!cat) return;
+    const idx = cat.products.findIndex(p => p.id === prodId);
+    if ((direction === 'up' && idx === 0) || (direction === 'down' && idx === cat.products.length - 1)) return;
+    const newProds = [...cat.products];
+    const swapIdx = direction === 'up' ? idx - 1 : idx + 1;
+    [newProds[idx], newProds[swapIdx]] = [newProds[swapIdx], newProds[idx]];
+    const newCategories = categories.map(c => c.id === catId ? { ...c, products: newProds } : c);
+    setCategories(newCategories);
+    try {
+      await api.post('/admin/products/products/reorder', { ordered_ids: newProds.map(p => p.id) });
+    } catch {
+      showToast('Failed to save product order.', 'error');
+      fetchCategories();
+    }
+  };
+
   // Quick statistics calculation
   const totalSales = orders
     .filter(o => o.status !== 'cancelled')
@@ -897,14 +1015,14 @@ export default function HistoryPage() {
   // Filtered orders list
   const filteredOrders = orders.filter(order => {
     const matchesFilter = orderFilter === 'all' || order.status === orderFilter;
-    const matchesSearch = 
+    const matchesSearch =
       order.customer_name.toLowerCase().includes(orderQuery.toLowerCase()) ||
       order.order_number.toLowerCase().includes(orderQuery.toLowerCase());
     return matchesFilter && matchesSearch;
   });
 
   // Filtered stock list
-  const filteredStock = stock.filter(item => 
+  const filteredStock = stock.filter(item =>
     item.name.toLowerCase().includes(stockQuery.toLowerCase()) ||
     item.category.toLowerCase().includes(stockQuery.toLowerCase())
   );
@@ -920,9 +1038,9 @@ export default function HistoryPage() {
         quantity_on_hand: newQty,
         is_in_stock: inStock
       });
-      
+
       // Update local state
-      setStock(prev => prev.map(s => 
+      setStock(prev => prev.map(s =>
         s.product_id === productId ? { ...s, quantity_on_hand: newQty, is_in_stock: inStock } : s
       ));
       showToast('Stock quantity updated successfully.');
@@ -945,7 +1063,7 @@ export default function HistoryPage() {
         is_in_stock: newInStock
       });
 
-      setStock(prev => prev.map(s => 
+      setStock(prev => prev.map(s =>
         s.product_id === productId ? { ...s, quantity_on_hand: newQty, is_in_stock: newInStock } : s
       ));
       showToast(newInStock ? 'Item set to in-stock.' : 'Item set to out-of-stock.');
@@ -1008,25 +1126,25 @@ export default function HistoryPage() {
       )}
 
       {/* Top sticky navbar */}
-      <div style={{ 
-        background: '#FFF', 
-        borderBottom: '1px solid #E8C8C8', 
+      <div style={{
+        background: '#FFF',
+        borderBottom: '1px solid #E8C8C8',
         position: 'sticky', top: 0, zIndex: 10,
         boxShadow: '0 2px 10px rgba(74, 15, 23, 0.05)'
       }}>
-        <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '16px 20px', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4" style={{ maxWidth: '1280px', margin: '0 auto', padding: '16px 20px' }}>
           <div>
             <h1 style={{ margin: 0, fontSize: '26px', fontFamily: 'var(--font-heading)', color: '#7B1E2B' }}>
               Admin Management Portal
             </h1>
             <p style={{ margin: '2px 0 0', color: '#8A5A2B', fontSize: '13px' }}>Fulfillment and Live Stock Tracking Dashboard</p>
           </div>
-          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+          <div className="flex flex-wrap sm:flex-nowrap gap-3 items-center w-full sm:w-auto">
             <button
               onClick={() => setShowAddOrder(true)}
-              style={{ 
-                padding: '10px 20px', borderRadius: '8px', border: 'none', 
-                background: '#7B1E2B', color: '#FFF', fontSize: '14px', fontWeight: 600, 
+              style={{
+                padding: '10px 20px', borderRadius: '8px', border: 'none',
+                background: '#7B1E2B', color: '#FFF', fontSize: '14px', fontWeight: 600,
                 cursor: 'pointer', boxShadow: '0 4px 10px rgba(123, 30, 43, 0.15)',
                 transition: 'transform 0.2s', display: 'flex', alignItems: 'center', gap: '6px'
               }}
@@ -1037,8 +1155,8 @@ export default function HistoryPage() {
             </button>
             <button
               onClick={() => { fetchOrders(); fetchStock(); showToast('Dashboard refreshed.'); }}
-              style={{ 
-                padding: '10px 20px', borderRadius: '8px', border: '1px solid #E8C8C8', 
+              style={{
+                padding: '10px 20px', borderRadius: '8px', border: '1px solid #E8C8C8',
                 background: '#FFF', color: '#4A0F17', fontSize: '14px', fontWeight: 600,
                 cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px',
                 transition: 'background 0.2s'
@@ -1050,7 +1168,7 @@ export default function HistoryPage() {
             </button>
 
             {/* Logout */}
-            <div style={{ borderLeft: '1px solid #E8C8C8', paddingLeft: '12px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div className="flex items-center gap-2 pl-0 sm:pl-3 sm:border-l sm:border-[#E8C8C8] w-full sm:w-auto mt-2 sm:mt-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-[#E8C8C8]">
               <span style={{ fontSize: '12px', color: '#8A5A2B', fontWeight: 600, maxWidth: '120px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {adminEmail}
               </span>
@@ -1072,11 +1190,11 @@ export default function HistoryPage() {
         </div>
       </div>
 
-      <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '32px' }}>
-        
+      <div className="p-4 sm:p-8" style={{ maxWidth: '1280px', margin: '0 auto' }}>
+
         {/* Statistics Cards */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px', marginBottom: '32px' }}>
-          
+
           <div style={{ background: '#FFF', padding: '20px', borderRadius: '16px', border: '1px solid #E8C8C8', boxShadow: '0 4px 10px rgba(74, 15, 23, 0.02)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', color: '#8A5A2B', fontSize: '13px', fontWeight: 600, marginBottom: '8px' }}>
               <span>TOTAL SALES</span>
@@ -1115,7 +1233,7 @@ export default function HistoryPage() {
         </div>
 
         {/* Navigation Tabs */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '24px', background: '#FFF', borderRadius: '12px', padding: '6px', width: '100%', maxWidth: 'fit-content', border: '1px solid #E8C8C8', boxShadow: '0 4px 15px rgba(74, 15, 23, 0.05)' }}>
+        <div className="flex flex-row overflow-x-auto no-scrollbar w-full sm:w-max mb-6 p-1.5 bg-white rounded-xl border border-[#E8C8C8] shadow-sm gap-2">
           {(['orders', 'stock', 'delivery', 'products'] as const).map(tab => (
             <button
               key={tab}
@@ -1140,15 +1258,16 @@ export default function HistoryPage() {
         {/* ── ORDERS TAB CONTENT ── */}
         {activeTab === 'orders' && (
           <div>
-            
+
             {/* Filter and Search Bar */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '16px', marginBottom: '24px', flexWrap: 'wrap' }}>
-              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+              <div className="flex flex-row overflow-x-auto no-scrollbar w-full md:w-auto gap-2 pb-1">
                 {['all', 'pending', 'confirmed', 'preparing', 'ready', 'out_for_delivery', 'completed', 'cancelled'].map(f => (
                   <button
                     key={f}
                     onClick={() => setOrderFilter(f)}
                     style={{
+                      flexShrink: 0,
                       padding: '8px 16px', borderRadius: '999px', fontSize: '13px', fontWeight: 600,
                       border: '1px solid', cursor: 'pointer',
                       borderColor: orderFilter === f ? '#7B1E2B' : '#E8C8C8',
@@ -1169,8 +1288,9 @@ export default function HistoryPage() {
                 onChange={e => setOrderQuery(e.target.value)}
                 style={{
                   padding: '10px 16px', borderRadius: '8px', border: '1px solid #E8C8C8',
-                  width: '100%', maxWidth: '320px', outline: 'none', background: '#FFF', color: '#4A0F17'
+                  outline: 'none', background: '#FFF', color: '#4A0F17'
                 }}
+                className="w-full md:max-w-[320px]"
               />
             </div>
 
@@ -1243,7 +1363,7 @@ export default function HistoryPage() {
         {/* ── STOCK TAB CONTENT ── */}
         {activeTab === 'stock' && (
           <div>
-            
+
             {/* Search Stock bar */}
             <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '24px' }}>
               <input
@@ -1253,8 +1373,9 @@ export default function HistoryPage() {
                 onChange={e => setStockQuery(e.target.value)}
                 style={{
                   padding: '10px 16px', borderRadius: '8px', border: '1px solid #E8C8C8',
-                  width: '100%', maxWidth: '320px', outline: 'none', background: '#FFF', color: '#4A0F17'
+                  outline: 'none', background: '#FFF', color: '#4A0F17'
                 }}
+                className="w-full md:max-w-[320px]"
               />
             </div>
 
@@ -1278,24 +1399,24 @@ export default function HistoryPage() {
                     {filteredStock.map((item, i) => {
                       const isLow = item.quantity_on_hand <= 10 && item.is_in_stock;
                       return (
-                        <tr 
-                          key={item.product_id} 
-                          style={{ 
-                            borderBottom: i < filteredStock.length - 1 ? '1px solid #E8C8C8' : 'none', 
-                            transition: 'background 0.2s', 
-                            background: !item.is_in_stock ? '#FEE2E2' : (isLow ? '#FEF3C7' : 'transparent') 
-                          }} 
-                          onMouseEnter={e => e.currentTarget.style.background = '#FAF6F0'} 
+                        <tr
+                          key={item.product_id}
+                          style={{
+                            borderBottom: i < filteredStock.length - 1 ? '1px solid #E8C8C8' : 'none',
+                            transition: 'background 0.2s',
+                            background: !item.is_in_stock ? '#FEE2E2' : (isLow ? '#FEF3C7' : 'transparent')
+                          }}
+                          onMouseEnter={e => e.currentTarget.style.background = '#FAF6F0'}
                           onMouseLeave={e => e.currentTarget.style.background = !item.is_in_stock ? '#FEE2E2' : (isLow ? '#FEF3C7' : 'transparent')}
                         >
                           <td style={{ padding: '16px 20px', color: '#4A0F17', fontWeight: 600 }}>{item.name}</td>
-                          
+
                           <td style={{ padding: '16px 20px' }}>
                             <span style={{ fontSize: '11px', fontWeight: 700, padding: '4px 8px', borderRadius: '6px', background: '#F5F5F5', color: '#616161', border: '1px solid rgba(0,0,0,0.05)' }}>
                               {item.category.toUpperCase()}
                             </span>
                           </td>
-                          
+
                           <td style={{ padding: '16px 20px', whiteSpace: 'nowrap' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                               <button
@@ -1307,7 +1428,7 @@ export default function HistoryPage() {
                                   display: 'flex', alignItems: 'center', justifyContent: 'center'
                                 }}
                               >-</button>
-                              
+
                               <input
                                 type="number"
                                 min={0}
@@ -1336,7 +1457,7 @@ export default function HistoryPage() {
                               >+</button>
                             </div>
                           </td>
-                          
+
                           <td style={{ padding: '16px 20px' }}>
                             <StockBadge inStock={item.is_in_stock} qty={item.quantity_on_hand} />
                           </td>
@@ -1370,9 +1491,9 @@ export default function HistoryPage() {
           <div style={{ background: '#FFF', padding: '32px', borderRadius: '16px', border: '1px solid #E8C8C8', maxWidth: '600px', boxShadow: '0 4px 20px rgba(74, 15, 23, 0.05)' }}>
             <h3 style={{ margin: '0 0 16px', color: '#4A0F17', fontSize: '20px', fontFamily: 'var(--font-heading)' }}>Dynamic Delivery Pricing</h3>
             <p style={{ color: '#8A5A2B', fontSize: '14px', marginBottom: '24px', lineHeight: 1.5 }}>
-              Set the per-mile cost for local delivery. This rate multiplies by the customer's driving distance (calculated dynamically via Mapbox and OSRM) and adds to the base fee for customers beyond 5 miles.
+              Set the per-mile cost for local delivery. This rate multiplies by the customer's driving distance and adds to the base fee for customers beyond 5 miles.
             </p>
-            
+
             <div style={{ marginBottom: '24px' }}>
               <label style={{ display: 'block', fontSize: '13px', color: '#7B1E2B', marginBottom: '8px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Cost Per Mile ($)</label>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -1409,7 +1530,7 @@ export default function HistoryPage() {
         {activeTab === 'products' && (
           <div>
             {/* Header Row */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '12px' }}>
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
               <div>
                 <h2 style={{ margin: 0, fontSize: '20px', fontFamily: 'var(--font-heading)', color: '#4A0F17' }}>Product Catalog Manager</h2>
                 <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#8A5A2B' }}>Changes reflect immediately on the public menu</p>
@@ -1433,19 +1554,34 @@ export default function HistoryPage() {
                         showToast('Category updated.'); setEditingCategory(null); fetchCategories();
                       }} onCancel={() => setEditingCategory(null)} />
                     ) : (
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', background: '#FAF6F0', borderBottom: '1px solid #E8C8C8', flexWrap: 'wrap', gap: '10px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                          <button onClick={() => setExpandedCategory(expandedCategory === cat.id ? null : cat.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '18px', color: '#7B1E2B' }}>{expandedCategory === cat.id ? '▲' : '▶'}</button>
-                          <div>
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 sm:p-5 bg-[#FAF6F0] border-b border-[#E8C8C8] gap-4">
+                        <div className="flex items-start sm:items-center gap-3">
+                          {/* Category reorder arrows */}
+                          <div className="flex flex-col gap-[2px] mt-1 sm:mt-0">
+                            <button
+                              onClick={() => handleReorderCategories(cat.id, 'up')}
+                              disabled={categories.indexOf(cat) === 0}
+                              style={{ width: '22px', height: '22px', border: '1px solid #E8C8C8', borderRadius: '4px', background: '#FFF', cursor: 'pointer', fontSize: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: categories.indexOf(cat) === 0 ? 0.3 : 1 }}
+                              title="Move category up"
+                            >▲</button>
+                            <button
+                              onClick={() => handleReorderCategories(cat.id, 'down')}
+                              disabled={categories.indexOf(cat) === categories.length - 1}
+                              style={{ width: '22px', height: '22px', border: '1px solid #E8C8C8', borderRadius: '4px', background: '#FFF', cursor: 'pointer', fontSize: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: categories.indexOf(cat) === categories.length - 1 ? 0.3 : 1 }}
+                              title="Move category down"
+                            >▼</button>
+                          </div>
+                          <button onClick={() => setExpandedCategory(expandedCategory === cat.id ? null : cat.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '18px', color: '#7B1E2B' }} className="mt-1 sm:mt-0">{expandedCategory === cat.id ? '▲' : '▶'}</button>
+                          <div className="flex flex-col sm:flex-row sm:items-center">
                             <span style={{ fontWeight: 800, fontSize: '16px', color: '#4A0F17', fontFamily: 'var(--font-heading)' }}>{cat.name}</span>
-                            <span style={{ marginLeft: '10px', fontSize: '12px', color: '#8A5A2B' }}>{cat.product_count} item{cat.product_count !== 1 ? 's' : ''}</span>
-                            {!cat.is_active && <span style={{ marginLeft: '8px', fontSize: '11px', padding: '2px 8px', borderRadius: '999px', background: '#FEE2E2', color: '#991B1B', fontWeight: 700 }}>INACTIVE</span>}
+                            <span className="sm:ml-2.5 mt-1 sm:mt-0" style={{ fontSize: '12px', color: '#8A5A2B' }}>{cat.product_count} item{cat.product_count !== 1 ? 's' : ''}</span>
+                            {!cat.is_active && <span className="mt-2 sm:mt-0 w-fit" style={{ marginLeft: '8px', fontSize: '11px', padding: '2px 8px', borderRadius: '999px', background: '#FEE2E2', color: '#991B1B', fontWeight: 700 }}>INACTIVE</span>}
                           </div>
                         </div>
-                        <div style={{ display: 'flex', gap: '8px' }}>
-                          <button onClick={() => setShowAddProduct(cat.id)} style={{ padding: '6px 14px', borderRadius: '6px', border: '1px solid #7B1E2B', background: '#FFF', color: '#7B1E2B', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}>+ Add Item</button>
-                          <button onClick={() => setEditingCategory(cat)} style={{ padding: '6px 14px', borderRadius: '6px', border: '1px solid #E8C8C8', background: '#FFF', color: '#4A0F17', fontSize: '13px', cursor: 'pointer' }}>Edit</button>
-                          <button onClick={() => handleDeleteCategory(cat.id)} style={{ padding: '6px 14px', borderRadius: '6px', border: 'none', background: '#EF4444', color: '#FFF', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}>Delete</button>
+                        <div className="flex gap-2 w-full sm:w-auto mt-2 sm:mt-0">
+                          <button onClick={() => setShowAddProduct(cat.id)} className="flex-1 sm:flex-none" style={{ padding: '6px 14px', borderRadius: '6px', border: '1px solid #7B1E2B', background: '#FFF', color: '#7B1E2B', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}>+ Add Item</button>
+                          <button onClick={() => setEditingCategory(cat)} className="flex-1 sm:flex-none" style={{ padding: '6px 14px', borderRadius: '6px', border: '1px solid #E8C8C8', background: '#FFF', color: '#4A0F17', fontSize: '13px', cursor: 'pointer' }}>Edit</button>
+                          <button onClick={() => handleDeleteCategory(cat.id)} className="flex-1 sm:flex-none" style={{ padding: '6px 14px', borderRadius: '6px', border: 'none', background: '#EF4444', color: '#FFF', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}>Delete</button>
                         </div>
                       </div>
                     )}
@@ -1462,7 +1598,7 @@ export default function HistoryPage() {
                         {cat.products.length === 0 && showAddProduct !== cat.id && (
                           <p style={{ color: '#8A5A2B', fontSize: '13px', padding: '12px 0', textAlign: 'center' }}>No products in this category yet. Click "+ Add Item" to add one.</p>
                         )}
-                        {cat.products.map(prod => (
+                        {cat.products.map((prod, prodIdx) => (
                           <div key={prod.id}>
                             {editingProduct?.id === prod.id ? (
                               <EditProductRow prod={editingProduct} categories={categories} onSave={async (updates) => {
@@ -1470,22 +1606,39 @@ export default function HistoryPage() {
                                 showToast('Product updated.'); setEditingProduct(null); fetchCategories();
                               }} onCancel={() => setEditingProduct(null)} />
                             ) : (
-                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', borderRadius: '10px', background: prod.is_active ? '#FAF6F0' : '#FEF3F3', border: '1px solid #E8C8C8', flexWrap: 'wrap', gap: '10px' }}>
-                                <div style={{ flex: 1, minWidth: '200px' }}>
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                                    <span style={{ fontWeight: 700, color: '#4A0F17', fontSize: '15px' }}>{prod.name}</span>
-                                    {!prod.is_active && <span style={{ fontSize: '11px', padding: '2px 6px', borderRadius: '999px', background: '#FEE2E2', color: '#991B1B', fontWeight: 700 }}>INACTIVE</span>}
-                                    {!prod.is_in_stock && <span style={{ fontSize: '11px', padding: '2px 6px', borderRadius: '999px', background: '#FEF3C7', color: '#92400E', fontWeight: 700 }}>OUT OF STOCK</span>}
+                              <div className="flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-4 rounded-[10px] border border-[#E8C8C8] gap-4" style={{ background: prod.is_active ? '#FAF6F0' : '#FEF3F3' }}>
+                                {/* Product reorder arrows */}
+                                <div className="flex gap-2 w-full sm:w-auto">
+                                  <div className="flex flex-col gap-[2px] flex-shrink-0">
+                                    <button
+                                      onClick={() => handleReorderProducts(cat.id, prod.id, 'up')}
+                                      disabled={prodIdx === 0}
+                                      style={{ width: '20px', height: '20px', border: '1px solid #E8C8C8', borderRadius: '3px', background: '#FFF', cursor: 'pointer', fontSize: '9px', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: prodIdx === 0 ? 0.3 : 1 }}
+                                      title="Move item up"
+                                    >▲</button>
+                                    <button
+                                      onClick={() => handleReorderProducts(cat.id, prod.id, 'down')}
+                                      disabled={prodIdx === cat.products.length - 1}
+                                      style={{ width: '20px', height: '20px', border: '1px solid #E8C8C8', borderRadius: '3px', background: '#FFF', cursor: 'pointer', fontSize: '9px', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: prodIdx === cat.products.length - 1 ? 0.3 : 1 }}
+                                      title="Move item down"
+                                    >▼</button>
                                   </div>
-                                  <div style={{ fontSize: '13px', color: '#8A5A2B', marginTop: '2px' }}>
-                                    <strong style={{ color: '#2E7D32' }}>${(prod.base_price_cents / 100).toFixed(2)}</strong>
-                                    {prod.unit_label && <span style={{ marginLeft: '6px' }}>/ {prod.unit_label}</span>}
-                                    {prod.description && <span style={{ marginLeft: '8px', color: '#A0927A' }}>· {prod.description.slice(0, 60)}{prod.description.length > 60 ? '...' : ''}</span>}
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-2 flex-wrap mb-1">
+                                      <span style={{ fontWeight: 700, color: '#4A0F17', fontSize: '15px' }}>{prod.name}</span>
+                                      {!prod.is_active && <span style={{ fontSize: '11px', padding: '2px 6px', borderRadius: '999px', background: '#FEE2E2', color: '#991B1B', fontWeight: 700 }}>INACTIVE</span>}
+                                      {!prod.is_in_stock && <span style={{ fontSize: '11px', padding: '2px 6px', borderRadius: '999px', background: '#FEF3C7', color: '#92400E', fontWeight: 700 }}>OUT OF STOCK</span>}
+                                    </div>
+                                    <div className="text-[12px] sm:text-[13px] text-[#8A5A2B]">
+                                      <strong style={{ color: '#2E7D32' }}>${(prod.base_price_cents / 100).toFixed(2)}</strong>
+                                      {prod.unit_label && <span className="ml-1.5">/ {prod.unit_label}</span>}
+                                      {prod.description && <span className="ml-2 color-[#A0927A] truncate block sm:inline-block">· {prod.description.slice(0, 60)}{prod.description.length > 60 ? '...' : ''}</span>}
+                                    </div>
                                   </div>
                                 </div>
-                                <div style={{ display: 'flex', gap: '8px' }}>
-                                  <button onClick={() => setEditingProduct(prod)} style={{ padding: '5px 12px', borderRadius: '6px', border: '1px solid #E8C8C8', background: '#FFF', color: '#4A0F17', fontSize: '12px', cursor: 'pointer' }}>Edit</button>
-                                  <button onClick={() => handleDeleteProduct(prod.id)} style={{ padding: '5px 12px', borderRadius: '6px', border: 'none', background: '#EF4444', color: '#FFF', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}>Delete</button>
+                                <div className="flex gap-2 w-full sm:w-auto border-t sm:border-0 border-[#E8C8C8] pt-3 sm:pt-0 mt-1 sm:mt-0">
+                                  <button onClick={() => setEditingProduct(prod)} className="flex-1 sm:flex-none" style={{ padding: '5px 12px', borderRadius: '6px', border: '1px solid #E8C8C8', background: '#FFF', color: '#4A0F17', fontSize: '12px', cursor: 'pointer' }}>Edit</button>
+                                  <button onClick={() => handleDeleteProduct(prod.id)} className="flex-1 sm:flex-none" style={{ padding: '5px 12px', borderRadius: '6px', border: 'none', background: '#EF4444', color: '#FFF', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}>Delete</button>
                                 </div>
                               </div>
                             )}
@@ -1500,8 +1653,8 @@ export default function HistoryPage() {
 
             {/* Add Category Modal */}
             {showAddCategory && (
-              <div style={{ position: 'fixed', inset: 0, background: 'rgba(74,15,23,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(4px)' }} onClick={() => setShowAddCategory(false)}>
-                <div style={{ background: '#FAF6F0', borderRadius: '16px', padding: '32px', width: '100%', maxWidth: '440px', border: '1px solid #E8C8C8', boxShadow: '0 10px 30px rgba(74,15,23,0.15)' }} onClick={e => e.stopPropagation()}>
+              <div style={{ position: 'fixed', inset: 0, background: 'rgba(74,15,23,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(4px)' }} className="p-4" onClick={() => setShowAddCategory(false)}>
+                <div style={{ background: '#FAF6F0', borderRadius: '16px', width: '100%', maxWidth: '440px', border: '1px solid #E8C8C8', boxShadow: '0 10px 30px rgba(74,15,23,0.15)' }} className="p-5 sm:p-8" onClick={e => e.stopPropagation()}>
                   <AddCategoryForm onSave={async (data) => {
                     await api.post('/admin/products/categories', data);
                     showToast('Category created.'); setShowAddCategory(false); fetchCategories();

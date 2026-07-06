@@ -252,7 +252,7 @@ function CatalogContent() {
   const router = useRouter();
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeTab, setActiveTab] = useState<string>('dry-sweets');
+  const [activeTab, setActiveTab] = useState<string>('');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   // Dedicated ref for the MOBILE pill bar only
@@ -278,14 +278,14 @@ function CatalogContent() {
     fetchCatalog();
   }, [fetchCatalog]);
 
-  // Sync active tab from URL on load
+  // Sync active tab from URL or default to first category when catalog loads
   useEffect(() => {
     if (CATEGORY_PILLS.length === 0) return;
     const urlCategory = searchParams.get('category');
     const match = CATEGORY_PILLS.find((p) => p.filterKey === urlCategory);
-    
-    // Only update if current activeTab is invalid or url changed
-    if (!activeTab || !CATEGORY_PILLS.find(p => p.id === activeTab) || urlCategory) {
+    const currentIsValid = CATEGORY_PILLS.find(p => p.id === activeTab);
+    // Set active tab if: url param exists, or current tab is invalid/empty
+    if (urlCategory || !currentIsValid) {
       setActiveTab(match ? match.id : CATEGORY_PILLS[0].id);
     }
   }, [searchParams, CATEGORY_PILLS.length]);
@@ -351,7 +351,7 @@ function CatalogContent() {
        (p.description || '').toLowerCase().includes(searchQuery.toLowerCase())));
 
   // Desktop: single filtered list
-  const activeFilterKey = CATEGORY_PILLS.find((p) => p.id === activeTab)?.filterKey ?? 'dry-sweets';
+  const activeFilterKey = CATEGORY_PILLS.find((p) => p.id === activeTab)?.filterKey ?? CATEGORY_PILLS[0]?.filterKey ?? '';
   const desktopFilteredProducts = PRODUCTS.filter((product) => {
     const matchesSearch =
       product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -527,7 +527,7 @@ function CatalogContent() {
                     <p className="text-xs text-brown font-body mt-1 max-w-sm">Try a different keyword or category.</p>
                   </div>
                   <button
-                    onClick={() => { setSearchQuery(''); setActiveTab('dry-sweets'); router.replace('/menu'); }}
+                    onClick={() => { setSearchQuery(''); setActiveTab(CATEGORY_PILLS[0]?.id ?? ''); router.replace('/menu'); }}
                     className="btn-gold py-2 px-5 text-[10px] uppercase tracking-widest"
                   >
                     Show All

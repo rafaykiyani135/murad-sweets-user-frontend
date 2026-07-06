@@ -308,7 +308,7 @@ function CheckoutForm() {
                     >
                       <option value="Morning">Morning (10:00 AM – 1:00 PM)</option>
                       <option value="Afternoon">Afternoon (1:00 PM – 5:00 PM)</option>
-                      <option value="Evening">Evening (5:00 PM – 8:00 PM)</option>
+                      <option value="Evening">Evening (5:00 PM – 10:00 PM)</option>
                     </select>
                     {errors.slot && <span className="text-[10px] text-red-600 block mt-1">{errors.slot.message}</span>}
                   </div>

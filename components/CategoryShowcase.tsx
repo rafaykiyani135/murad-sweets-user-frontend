@@ -1,7 +1,7 @@
 'use client';
 
+import Link from 'next/link';
 import Image from 'next/image';
-import { useCart } from '@/app/store/useCart';
 import type { Product } from '@/app/data/products';
 
 const items = [
@@ -175,8 +175,6 @@ function FeatureList({ type, iconImage }: { type: string; features: string[]; ic
 }
 
 export default function CategoryShowcase() {
-  const { openCollectionModal, openPartyTrayModal, openSpecialtyModal, openPithaModal, openMishtiPerPoundModal } = useCart();
-
   const showcaseItems = items;
 
   return (
@@ -206,16 +204,13 @@ export default function CategoryShowcase() {
                     <FeatureList type={item.type} features={item.features} iconImage={item.iconImage} />
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={() => {
-                      openMishtiPerPoundModal();
-                    }}
+                  <Link
+                    href="/menu"
                     className="inline-flex items-center justify-center gap-1 sm:gap-3 bg-[#681628] text-white px-3 py-1.5 sm:px-8 sm:py-3.5 rounded hover:bg-[#541523] transition-colors font-semibold tracking-wide text-[9px] sm:text-sm md:text-base w-fit shadow-md hover:shadow-lg"
                   >
                     Order Now
                     <span>→</span>
-                  </button>
+                  </Link>
                 </div>
               </div>
 

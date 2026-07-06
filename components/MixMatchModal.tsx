@@ -27,8 +27,13 @@ export default function MixMatchModal() {
   const activeBoxSize = fixedSize || boxSize;
   const activePrice = isPartyTray ? mixMatchProduct!.price : MIX_MATCH_PRICES[activeBoxSize as 3 | 6 | 9];
 
-  // Filter available dry sweets that are in stock
-  const drySweets = PRODUCTS.filter((p) => p.category === 'dry-sweets' && p.inStock);
+  // Filter available dry sweets that are in stock (excluding mix and match boxes)
+  const excludedForPartyTray = ['peda', 'kalojam-sandwich', 'kathari-bhog', 'kheer-mouchak'];
+  const drySweets = PRODUCTS.filter((p) => {
+    if (p.category !== 'dry-sweets' || !p.inStock || p.product_type === 'custom_box') return false;
+    if (isPartyTray && excludedForPartyTray.includes(p.slug)) return false;
+    return true;
+  });
 
   // Initialize/Reset selections when product changes or box size changes
   useEffect(() => {
@@ -51,7 +56,7 @@ export default function MixMatchModal() {
   if (!mixMatchProduct) return null;
 
   const currentTotal = Object.values(selections).reduce((acc, qty) => acc + qty, 0);
-  const isBoxFull = currentTotal === activeBoxSize;
+  const isBoxFull = isPartyTray ? (currentTotal > 0 && currentTotal <= 5) : (currentTotal === activeBoxSize);
 
   const handleSizeChange = (size: 3 | 6 | 9) => {
     setBoxSize(size);
@@ -192,10 +197,12 @@ export default function MixMatchModal() {
               <div>
                 <div className="flex justify-between items-center border-b border-border pb-2.5 mb-4">
                   <span className="font-cinzel text-xs uppercase tracking-wider text-primary-deep font-semibold">
-                    {isPartyTray ? '1.' : '2.'} Select Sweets ({currentTotal} of {activeBoxSize} pcs)
+                    {isPartyTray ? '1.' : '2.'} Select Sweets {isPartyTray ? '(Max 5 items)' : `(${currentTotal} of ${activeBoxSize} pcs)`}
                   </span>
                   <span className={`text-xs font-semibold px-2 py-0.5 rounded font-cinzel ${isBoxFull ? 'bg-primary text-white' : 'bg-blush text-primary'}`}>
-                    {isBoxFull ? 'Box Filled!' : `${activeBoxSize - currentTotal} remaining`}
+                    {isPartyTray 
+                      ? (currentTotal > 0 ? `${currentTotal}/5 Selected` : 'Select up to 5') 
+                      : (isBoxFull ? 'Box Filled!' : `${activeBoxSize - currentTotal} remaining`)}
                   </span>
                 </div>
 
@@ -228,29 +235,50 @@ export default function MixMatchModal() {
                         </div>
 
                         {/* Adjuster */}
-                        <div className="flex items-center space-x-2 bg-cream/30 border border-border rounded">
+                        {isPartyTray ? (
                           <button
-                            onClick={() => updateSweetQty(sweet.id, -1)}
-                            disabled={count === 0}
-                            className={`p-1.5 transition-colors ${
-                              count === 0 ? 'text-gray-300' : 'text-primary hover:text-accent'
+                            onClick={() => {
+                              const isSelected = !!selections[sweet.id];
+                              if (isSelected) {
+                                setSelections({ ...selections, [sweet.id]: 0 });
+                              } else {
+                                if (currentTotal >= 5) return;
+                                setSelections({ ...selections, [sweet.id]: 1 });
+                              }
+                            }}
+                            className={`w-6 h-6 rounded flex items-center justify-center border transition-colors ${
+                              selections[sweet.id]
+                                ? 'bg-primary border-primary text-white'
+                                : 'border-gray-300'
                             }`}
                           >
-                            <Minus className="h-3 w-3" />
+                            {!!selections[sweet.id] && <Check className="w-4 h-4" />}
                           </button>
-                          <span className="text-xs font-semibold w-4 text-center text-primary-deep font-cinzel">
-                            {count}
-                          </span>
-                          <button
-                            onClick={() => updateSweetQty(sweet.id, 1)}
-                            disabled={isBoxFull}
-                            className={`p-1.5 transition-colors ${
-                              isBoxFull ? 'text-gray-300' : 'text-primary hover:text-accent'
-                            }`}
-                          >
-                            <Plus className="h-3 w-3" />
-                          </button>
-                        </div>
+                        ) : (
+                          <div className="flex items-center space-x-2 bg-cream/30 border border-border rounded">
+                            <button
+                              onClick={() => updateSweetQty(sweet.id, -1)}
+                              disabled={count === 0}
+                              className={`p-1.5 transition-colors ${
+                                count === 0 ? 'text-gray-300' : 'text-primary hover:text-accent'
+                              }`}
+                            >
+                              <Minus className="h-3 w-3" />
+                            </button>
+                            <span className="text-xs font-semibold w-4 text-center text-primary-deep font-cinzel">
+                              {count}
+                            </span>
+                            <button
+                              onClick={() => updateSweetQty(sweet.id, 1)}
+                              disabled={isBoxFull}
+                              className={`p-1.5 transition-colors ${
+                                isBoxFull ? 'text-gray-300' : 'text-primary hover:text-accent'
+                              }`}
+                            >
+                              <Plus className="h-3 w-3" />
+                            </button>
+                          </div>
+                        )}
                       </div>
                     );
                   })}
@@ -287,7 +315,7 @@ export default function MixMatchModal() {
                   }`}
                 >
                   {isBoxFull && <Check className="h-4 w-4 mr-1 text-accent" />}
-                  <span>{isBoxFull ? 'Add To Cart' : `Fill Box (${activeBoxSize - currentTotal} left)`}</span>
+                  <span>{isPartyTray ? (isBoxFull ? 'Add To Cart' : 'Select at least 1') : (isBoxFull ? 'Add To Cart' : `Fill Box (${activeBoxSize - currentTotal} left)`)}</span>
                 </button>
               </div>
             </div>
