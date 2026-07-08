@@ -341,77 +341,7 @@ function PaymentStatusUpdateModal({
   );
 }
 
-// ─── Payment Status Update Modal ────────────────────────────────────────────
-function PaymentStatusUpdateModal({
-  order,
-  onClose,
-  onSuccess
-}: {
-  order: OrderSummary;
-  onClose: () => void;
-  onSuccess: () => void;
-}) {
-  const [paymentStatus, setPaymentStatus] = useState(order.payment_status);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
 
-  const handleUpdate = async () => {
-    setLoading(true);
-    setError('');
-    try {
-      await api.patch(`/history/orders/${order.order_number}/payment-status`, { payment_status: paymentStatus });
-      onSuccess();
-      onClose();
-    } catch (e: any) {
-      setError(e?.response?.data?.detail ?? 'Payment status update failed.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div style={{
-      position: 'fixed', inset: 0, backgroundColor: 'rgba(74, 15, 23, 0.4)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000,
-      backdropFilter: 'blur(4px)',
-    }} onClick={onClose}>
-      <div style={{
-        background: '#FAF6F0', borderRadius: '16px', padding: '32px', width: '100%', maxWidth: '400px',
-        border: '1px solid #E8C8C8', boxShadow: '0 10px 30px rgba(74, 15, 23, 0.15)'
-      }} onClick={e => e.stopPropagation()}>
-        <h3 style={{ margin: '0 0 16px', color: '#4A0F17', fontSize: '20px', fontFamily: 'var(--font-heading)' }}>Update Payment Status</h3>
-        <p style={{ margin: '0 0 8px', color: '#8A5A2B', fontSize: '14px' }}>Order: <strong style={{ color: '#4A0F17' }}>{order.order_number}</strong></p>
-        <p style={{ margin: '0 0 16px', color: '#8A5A2B', fontSize: '13px' }}>
-          Method: <span style={{ fontWeight: 700, color: '#4A0F17', textTransform: 'uppercase' }}>{order.payment_method}</span>
-        </p>
-        <select
-          value={paymentStatus}
-          onChange={e => setPaymentStatus(e.target.value)}
-          style={{
-            width: '100%', padding: '12px', borderRadius: '8px', marginBottom: '24px',
-            background: '#FFF', color: '#4A0F17', border: '1px solid #E8C8C8',
-            fontFamily: 'var(--font-body)', outline: 'none', fontWeight: 600
-          }}
-        >
-          {Object.keys(PAYMENT_STATUS_COLORS).map(s => (
-            <option key={s} value={s}>{s.replace(/_/g, ' ').toUpperCase()}</option>
-          ))}
-        </select>
-        {error && <p style={{ color: '#7B1E2B', fontSize: '13px', marginBottom: '16px' }}>{error}</p>}
-        <div style={{ display: 'flex', gap: '12px' }}>
-          <button onClick={onClose} style={{
-            flex: 1, padding: '12px', borderRadius: '8px', border: '1px solid #E8C8C8',
-            background: '#FFF', color: '#8A5A2B', cursor: 'pointer', fontWeight: 600
-          }}>Cancel</button>
-          <button onClick={handleUpdate} disabled={loading} style={{
-            flex: 1, padding: '12px', borderRadius: '8px', border: 'none',
-            background: '#7B1E2B', color: '#FFF', cursor: 'pointer', fontWeight: 600
-          }}>{loading ? 'Saving...' : 'Save'}</button>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 // ─── Order Detail Modal ────────────────────────────────────────────────────
 function OrderDetailModal({
