@@ -2,14 +2,15 @@ import { Metadata } from 'next';
 import { getProductBySlug } from '@/app/lib/api';
 
 type Props = {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
   children: React.ReactNode;
 };
 
 export async function generateMetadata(
   { params }: Props
 ): Promise<Metadata> {
-  const slug = params.slug;
+  const resolvedParams = await params;
+  const slug = resolvedParams.slug;
 
   try {
     const product = await getProductBySlug(slug);
