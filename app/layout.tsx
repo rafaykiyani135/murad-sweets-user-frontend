@@ -22,22 +22,29 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Murad Sweets | Handcrafted Bangladeshi Sweets (Mithai) in USA",
-  description: "Experience the premium taste of authentic, home-cooked Bangladeshi sweets. Order custom mix-and-match dry sweet boxes, rasmalai cake, specialty doi, party trays, and traditional winter pitha.",
+  title: "Murad Sweets | Authentic Bangladeshi Mishti & Bengali Mithai in USA",
+  description: "Experience the premium taste of authentic, home-cooked Bangladeshi sweets in Houston, Texas. Order custom mix-and-match dry sweet boxes, authentic Mishti Doi, Rasmalai, Chom Chom, Kalo Jam, Sandesh, party trays, and traditional winter pitha.",
   keywords: [
-    "Bangladeshi sweets",
-    "Mithai USA",
-    "Halal sweets",
-    "Rasmalai cake",
-    "Custom sweet boxes",
-    "Desi sweets",
+    "Bengali Mithai",
+    "Bangladeshi Mishti",
+    "Mishti Doi",
+    "Rasmalai Cake",
+    "Premium Indian Sweets",
+    "Desi Sweets Houston",
+    "Halal Sweets USA",
+    "Custom Sweet Boxes",
     "Traditional Pitha",
-    "Mishti",
-    "Bengali Sweets"
+    "Chom Chom",
+    "Kalo Jam",
+    "Gulab Jamun",
+    "Sandesh",
+    "Rasgulla",
+    "Bangladeshi Mithai Online",
+    "Bengali Desserts"
   ],
   openGraph: {
-    title: "Murad Sweets | Bangladeshi Sweets & Custom Mithai Boxes",
-    description: "Premium, authentic home-cooked Bangladeshi sweets. Specializing in mix-and-match boxes, rasmalai cake, and traditional pitha.",
+    title: "Murad Sweets | Authentic Bangladeshi Mishti & Bengali Mithai",
+    description: "Premium, authentic home-cooked Bangladeshi sweets in Houston. Specializing in mix-and-match boxes, Mishti Doi, Rasmalai, and traditional pitha.",
     url: "https://muradsweets.com",
     siteName: "Murad Sweets",
     locale: "en_US",
@@ -45,8 +52,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Murad Sweets | Premium Bangladeshi Mithai",
-    description: "Authentic, handcrafted Bangladeshi sweets. Order custom mix-and-match boxes today.",
+    title: "Murad Sweets | Premium Bangladeshi Mishti & Bengali Mithai",
+    description: "Authentic, handcrafted Bangladeshi sweets. Order custom mix-and-match boxes, Mishti Doi, and more today.",
   },
   robots: {
     index: true,

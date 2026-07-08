@@ -9,6 +9,8 @@ import { api } from '@/app/lib/api';
 interface OrderSummary {
   order_number: string;
   status: string;
+  payment_status: string;
+  payment_method: string;
   customer_name: string;
   total: number;
   scheduled_date: string;
@@ -29,6 +31,8 @@ interface OrderItemDetail {
 interface OrderDetail {
   order_number: string;
   status: string;
+  payment_status: string;
+  payment_method: string;
   customer: {
     full_name: string;
     email: string;
@@ -139,6 +143,35 @@ function StatusBadge({ status, onClick }: { status: string; onClick?: () => void
   );
 }
 
+const PAYMENT_STATUS_COLORS: Record<string, { bg: string; text: string; dot: string; label: string }> = {
+  pending: { bg: '#FEF3C7', text: '#92400E', dot: '#D97706', label: '⏳ Pending' },
+  paid: { bg: '#D1FAE5', text: '#065F46', dot: '#10B981', label: '💰 Paid' },
+  failed: { bg: '#FEE2E2', text: '#991B1B', dot: '#EF4444', label: '❌ Failed' },
+  refunded: { bg: '#EDE9FE', text: '#5B21B6', dot: '#7C3AED', label: '↩️ Refunded' },
+};
+
+function PaymentStatusBadge({ status, onClick }: { status: string; onClick?: () => void }) {
+  const config = PAYMENT_STATUS_COLORS[status] ?? { bg: '#F3F4F6', text: '#374151', dot: '#9CA3AF', label: status };
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        display: 'inline-flex', alignItems: 'center', gap: '6px',
+        padding: '6px 14px', borderRadius: '999px', fontSize: '12px', fontWeight: 600,
+        backgroundColor: config.bg, color: config.text,
+        border: '1px solid rgba(0,0,0,0.05)', cursor: onClick ? 'pointer' : 'default',
+        boxShadow: onClick ? '0 2px 4px rgba(74, 15, 23, 0.05)' : 'none',
+        transition: 'all 0.2s ease',
+      }}
+      onMouseEnter={e => { if (onClick) e.currentTarget.style.transform = 'translateY(-1px)'; }}
+      onMouseLeave={e => { if (onClick) e.currentTarget.style.transform = 'translateY(0)'; }}
+    >
+      <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: config.dot, flexShrink: 0 }} />
+      {config.label}
+    </button>
+  );
+}
+
 function StockBadge({ inStock, qty }: { inStock: boolean; qty: number }) {
   if (inStock) {
     const isLow = qty <= 10;
@@ -217,6 +250,150 @@ function StatusUpdateModal({
           }}
         >
           {Object.keys(STATUS_COLORS).map(s => (
+            <option key={s} value={s}>{s.replace(/_/g, ' ').toUpperCase()}</option>
+          ))}
+        </select>
+        {error && <p style={{ color: '#7B1E2B', fontSize: '13px', marginBottom: '16px' }}>{error}</p>}
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <button onClick={onClose} style={{
+            flex: 1, padding: '12px', borderRadius: '8px', border: '1px solid #E8C8C8',
+            background: '#FFF', color: '#8A5A2B', cursor: 'pointer', fontWeight: 600
+          }}>Cancel</button>
+          <button onClick={handleUpdate} disabled={loading} style={{
+            flex: 1, padding: '12px', borderRadius: '8px', border: 'none',
+            background: '#7B1E2B', color: '#FFF', cursor: 'pointer', fontWeight: 600
+          }}>{loading ? 'Saving...' : 'Save'}</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Payment Status Update Modal ────────────────────────────────────────────
+function PaymentStatusUpdateModal({
+  order,
+  onClose,
+  onSuccess
+}: {
+  order: OrderSummary;
+  onClose: () => void;
+  onSuccess: () => void;
+}) {
+  const [paymentStatus, setPaymentStatus] = useState(order.payment_status);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleUpdate = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      await api.patch(`/history/orders/${order.order_number}/payment-status`, { payment_status: paymentStatus });
+      onSuccess();
+      onClose();
+    } catch (e: any) {
+      setError(e?.response?.data?.detail ?? 'Payment status update failed.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div style={{
+      position: 'fixed', inset: 0, backgroundColor: 'rgba(74, 15, 23, 0.4)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000,
+      backdropFilter: 'blur(4px)',
+    }} onClick={onClose}>
+      <div style={{
+        background: '#FAF6F0', borderRadius: '16px', padding: '32px', width: '100%', maxWidth: '400px',
+        border: '1px solid #E8C8C8', boxShadow: '0 10px 30px rgba(74, 15, 23, 0.15)'
+      }} onClick={e => e.stopPropagation()}>
+        <h3 style={{ margin: '0 0 16px', color: '#4A0F17', fontSize: '20px', fontFamily: 'var(--font-heading)' }}>Update Payment Status</h3>
+        <p style={{ margin: '0 0 8px', color: '#8A5A2B', fontSize: '14px' }}>Order: <strong style={{ color: '#4A0F17' }}>{order.order_number}</strong></p>
+        <p style={{ margin: '0 0 16px', color: '#8A5A2B', fontSize: '13px' }}>
+          Method: <span style={{ fontWeight: 700, color: '#4A0F17', textTransform: 'uppercase' }}>{order.payment_method}</span>
+        </p>
+        <select
+          value={paymentStatus}
+          onChange={e => setPaymentStatus(e.target.value)}
+          style={{
+            width: '100%', padding: '12px', borderRadius: '8px', marginBottom: '24px',
+            background: '#FFF', color: '#4A0F17', border: '1px solid #E8C8C8',
+            fontFamily: 'var(--font-body)', outline: 'none', fontWeight: 600
+          }}
+        >
+          {Object.keys(PAYMENT_STATUS_COLORS).map(s => (
+            <option key={s} value={s}>{s.replace(/_/g, ' ').toUpperCase()}</option>
+          ))}
+        </select>
+        {error && <p style={{ color: '#7B1E2B', fontSize: '13px', marginBottom: '16px' }}>{error}</p>}
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <button onClick={onClose} style={{
+            flex: 1, padding: '12px', borderRadius: '8px', border: '1px solid #E8C8C8',
+            background: '#FFF', color: '#8A5A2B', cursor: 'pointer', fontWeight: 600
+          }}>Cancel</button>
+          <button onClick={handleUpdate} disabled={loading} style={{
+            flex: 1, padding: '12px', borderRadius: '8px', border: 'none',
+            background: '#7B1E2B', color: '#FFF', cursor: 'pointer', fontWeight: 600
+          }}>{loading ? 'Saving...' : 'Save'}</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Payment Status Update Modal ────────────────────────────────────────────
+function PaymentStatusUpdateModal({
+  order,
+  onClose,
+  onSuccess
+}: {
+  order: OrderSummary;
+  onClose: () => void;
+  onSuccess: () => void;
+}) {
+  const [paymentStatus, setPaymentStatus] = useState(order.payment_status);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleUpdate = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      await api.patch(`/history/orders/${order.order_number}/payment-status`, { payment_status: paymentStatus });
+      onSuccess();
+      onClose();
+    } catch (e: any) {
+      setError(e?.response?.data?.detail ?? 'Payment status update failed.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div style={{
+      position: 'fixed', inset: 0, backgroundColor: 'rgba(74, 15, 23, 0.4)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000,
+      backdropFilter: 'blur(4px)',
+    }} onClick={onClose}>
+      <div style={{
+        background: '#FAF6F0', borderRadius: '16px', padding: '32px', width: '100%', maxWidth: '400px',
+        border: '1px solid #E8C8C8', boxShadow: '0 10px 30px rgba(74, 15, 23, 0.15)'
+      }} onClick={e => e.stopPropagation()}>
+        <h3 style={{ margin: '0 0 16px', color: '#4A0F17', fontSize: '20px', fontFamily: 'var(--font-heading)' }}>Update Payment Status</h3>
+        <p style={{ margin: '0 0 8px', color: '#8A5A2B', fontSize: '14px' }}>Order: <strong style={{ color: '#4A0F17' }}>{order.order_number}</strong></p>
+        <p style={{ margin: '0 0 16px', color: '#8A5A2B', fontSize: '13px' }}>
+          Method: <span style={{ fontWeight: 700, color: '#4A0F17', textTransform: 'uppercase' }}>{order.payment_method}</span>
+        </p>
+        <select
+          value={paymentStatus}
+          onChange={e => setPaymentStatus(e.target.value)}
+          style={{
+            width: '100%', padding: '12px', borderRadius: '8px', marginBottom: '24px',
+            background: '#FFF', color: '#4A0F17', border: '1px solid #E8C8C8',
+            fontFamily: 'var(--font-body)', outline: 'none', fontWeight: 600
+          }}
+        >
+          {Object.keys(PAYMENT_STATUS_COLORS).map(s => (
             <option key={s} value={s}>{s.replace(/_/g, ' ').toUpperCase()}</option>
           ))}
         </select>
@@ -467,23 +644,68 @@ function OrderDetailModal({
           </div>
         )}
 
+        {/* Payment Info */}
+        <div style={{ background: '#FFF', padding: '16px', borderRadius: '12px', border: '1px solid #E8C8C8', marginBottom: '24px' }}>
+          <h4 style={{ margin: '0 0 10px', color: '#7B1E2B', fontSize: '14px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Payment Info</h4>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'center' }}>
+            <div>
+              <span style={{ fontSize: '13px', color: '#8A5A2B' }}>Method: </span>
+              <span style={{ fontWeight: 700, color: '#4A0F17', textTransform: 'uppercase', fontSize: '13px' }}>{order.payment_method}</span>
+            </div>
+            <div>
+              <span style={{ fontSize: '13px', color: '#8A5A2B' }}>Status: </span>
+              <PaymentStatusBadge status={order.payment_status} />
+            </div>
+          </div>
+        </div>
+
         {/* Status Actions */}
-        <div style={{ borderTop: '1px solid #E8C8C8', paddingTop: '20px', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
-          <div>
-            <label style={{ display: 'block', fontSize: '12px', color: '#8A5A2B', marginBottom: '6px', fontWeight: 600 }}>Update Order Status</label>
-            <select
-              value={order.status}
-              disabled={updatingStatus}
-              onChange={e => handleStatusChange(e.target.value)}
-              style={{
-                padding: '8px 16px', borderRadius: '8px', border: '1px solid #E8C8C8',
-                background: '#FFF', color: '#4A0F17', fontWeight: 600, outline: 'none'
-              }}
-            >
-              {Object.keys(STATUS_COLORS).map(s => (
-                <option key={s} value={s}>{s.replace(/_/g, ' ').toUpperCase()}</option>
-              ))}
-            </select>
+        <div style={{ borderTop: '1px solid #E8C8C8', paddingTop: '20px', display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', justifyContent: 'space-between', gap: '16px' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
+            <div>
+              <label style={{ display: 'block', fontSize: '12px', color: '#8A5A2B', marginBottom: '6px', fontWeight: 600 }}>Update Order Status</label>
+              <select
+                value={order.status}
+                disabled={updatingStatus}
+                onChange={e => handleStatusChange(e.target.value)}
+                style={{
+                  padding: '8px 16px', borderRadius: '8px', border: '1px solid #E8C8C8',
+                  background: '#FFF', color: '#4A0F17', fontWeight: 600, outline: 'none'
+                }}
+              >
+                {Object.keys(STATUS_COLORS).map(s => (
+                  <option key={s} value={s}>{s.replace(/_/g, ' ').toUpperCase()}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label style={{ display: 'block', fontSize: '12px', color: '#8A5A2B', marginBottom: '6px', fontWeight: 600 }}>Update Payment Status</label>
+              <select
+                value={order.payment_status}
+                disabled={updatingStatus}
+                onChange={async e => {
+                  setUpdatingStatus(true);
+                  setStatusError('');
+                  try {
+                    await api.patch(`/history/orders/${order.order_number}/payment-status`, { payment_status: e.target.value });
+                    setOrder({ ...order, payment_status: e.target.value });
+                    onStatusUpdated();
+                  } catch (err: any) {
+                    setStatusError(err?.response?.data?.detail ?? 'Payment status update failed.');
+                  } finally {
+                    setUpdatingStatus(false);
+                  }
+                }}
+                style={{
+                  padding: '8px 16px', borderRadius: '8px', border: '1px solid #E8C8C8',
+                  background: '#FFF', color: '#4A0F17', fontWeight: 600, outline: 'none'
+                }}
+              >
+                {Object.keys(PAYMENT_STATUS_COLORS).map(s => (
+                  <option key={s} value={s}>{s.replace(/_/g, ' ').toUpperCase()}</option>
+                ))}
+              </select>
+            </div>
           </div>
           <button onClick={onClose} style={{ padding: '10px 24px', borderRadius: '8px', border: '1px solid #E8C8C8', background: '#FFF', color: '#8A5A2B', fontWeight: 600, cursor: 'pointer' }}>Close Details</button>
         </div>
@@ -845,6 +1067,7 @@ export default function HistoryPage() {
 
   // Modal targets
   const [statusTarget, setStatusTarget] = useState<OrderSummary | null>(null);
+  const [paymentStatusTarget, setPaymentStatusTarget] = useState<OrderSummary | null>(null);
   const [selectedOrderNumber, setSelectedOrderNumber] = useState<string | null>(null);
   const [showAddOrder, setShowAddOrder] = useState(false);
 
@@ -1132,7 +1355,7 @@ export default function HistoryPage() {
         position: 'sticky', top: 0, zIndex: 10,
         boxShadow: '0 2px 10px rgba(74, 15, 23, 0.05)'
       }}>
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4" style={{ maxWidth: '1280px', margin: '0 auto', padding: '16px 20px' }}>
+        <div style={{ maxWidth: '1600px', margin: '0 auto', padding: '16px 20px', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
           <div>
             <h1 style={{ margin: 0, fontSize: '26px', fontFamily: 'var(--font-heading)', color: '#7B1E2B' }}>
               Admin Management Portal
@@ -1190,7 +1413,7 @@ export default function HistoryPage() {
         </div>
       </div>
 
-      <div className="p-4 sm:p-8" style={{ maxWidth: '1280px', margin: '0 auto' }}>
+      <div style={{ maxWidth: '1600px', margin: '0 auto', padding: '32px' }}>
 
         {/* Statistics Cards */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px', marginBottom: '32px' }}>
@@ -1303,8 +1526,8 @@ export default function HistoryPage() {
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
                   <thead>
                     <tr style={{ borderBottom: '2px solid #E8C8C8', background: '#FAF6F0' }}>
-                      {['Order #', 'Customer', 'Date Placed', 'Type', 'Items', 'Total', 'Status', 'Details'].map(h => (
-                        <th key={h} style={{ padding: '16px 20px', textAlign: 'left', color: '#4A0F17', fontWeight: 700, fontSize: '13px', textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap', fontFamily: 'var(--font-subheading)' }}>
+                      {['Order #', 'Customer', 'Date Placed', 'Type', 'Items', 'Total', 'Status', 'Payment', 'Details'].map(h => (
+                        <th key={h} style={{ padding: '12px 14px', textAlign: 'left', color: '#4A0F17', fontWeight: 700, fontSize: '13px', textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap', fontFamily: 'var(--font-subheading)' }}>
                           {h}
                         </th>
                       ))}
@@ -1318,26 +1541,29 @@ export default function HistoryPage() {
                         onMouseEnter={e => e.currentTarget.style.background = '#FAF6F0'}
                         onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                       >
-                        <td style={{ padding: '16px 20px', fontWeight: 700, color: '#7B1E2B' }}>
+                        <td style={{ padding: '12px 14px', fontWeight: 700, color: '#7B1E2B' }}>
                           {order.order_number}
                         </td>
-                        <td style={{ padding: '16px 20px', color: '#4A0F17', fontWeight: 600 }}>{order.customer_name}</td>
-                        <td style={{ padding: '16px 20px', color: '#8A5A2B', whiteSpace: 'nowrap' }}>
+                        <td style={{ padding: '12px 14px', color: '#4A0F17', fontWeight: 600 }}>{order.customer_name}</td>
+                        <td style={{ padding: '12px 14px', color: '#8A5A2B', whiteSpace: 'nowrap' }}>
                           {new Date(order.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                         </td>
-                        <td style={{ padding: '16px 20px' }}>
+                        <td style={{ padding: '12px 14px' }}>
                           <span style={{ fontSize: '11px', fontWeight: 700, padding: '4px 10px', borderRadius: '6px', background: order.fulfillment_type === 'delivery' ? '#E1F5FE' : '#F3E5F5', color: order.fulfillment_type === 'delivery' ? '#0277BD' : '#7B1FA2', border: '1px solid rgba(0,0,0,0.05)' }}>
                             {order.fulfillment_type === 'delivery' ? '🚗 Delivery' : '🏪 Pickup'}
                           </span>
                         </td>
-                        <td style={{ padding: '16px 20px', color: '#4A0F17', textAlign: 'center', fontWeight: 600 }}>{order.item_count}</td>
-                        <td style={{ padding: '16px 20px', fontWeight: 700, color: '#2E7D32', whiteSpace: 'nowrap' }}>
+                        <td style={{ padding: '12px 14px', color: '#4A0F17', textAlign: 'center', fontWeight: 600 }}>{order.item_count}</td>
+                        <td style={{ padding: '12px 14px', fontWeight: 700, color: '#2E7D32', whiteSpace: 'nowrap' }}>
                           ${order.total.toFixed(2)}
                         </td>
-                        <td style={{ padding: '16px 20px' }}>
+                        <td style={{ padding: '12px 14px' }}>
                           <StatusBadge status={order.status} onClick={() => setStatusTarget(order)} />
                         </td>
-                        <td style={{ padding: '16px 20px' }}>
+                        <td style={{ padding: '12px 14px' }}>
+                          <PaymentStatusBadge status={order.payment_status} onClick={() => setPaymentStatusTarget(order)} />
+                        </td>
+                        <td style={{ padding: '12px 14px' }}>
                           <button
                             onClick={() => setSelectedOrderNumber(order.order_number)}
                             style={{
@@ -1667,6 +1893,7 @@ export default function HistoryPage() {
       </div>
 
       {statusTarget && <StatusUpdateModal order={statusTarget} onClose={() => setStatusTarget(null)} onSuccess={() => { fetchOrders(); fetchStock(); showToast('Order status updated.'); }} />}
+      {paymentStatusTarget && <PaymentStatusUpdateModal order={paymentStatusTarget} onClose={() => setPaymentStatusTarget(null)} onSuccess={() => { fetchOrders(); showToast('Payment status updated.'); }} />}
       {selectedOrderNumber && <OrderDetailModal orderNumber={selectedOrderNumber} onClose={() => setSelectedOrderNumber(null)} onStatusUpdated={() => { fetchOrders(); fetchStock(); showToast('Order status updated.'); }} />}
       {showAddOrder && <AddOrderModal onClose={() => setShowAddOrder(false)} onSuccess={() => { fetchOrders(); fetchStock(); showToast('Manual order created successfully.'); }} />}
     </div>

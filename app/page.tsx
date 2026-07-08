@@ -68,8 +68,8 @@ export default function Home() {
             >
               <div className="w-12 h-[2px] bg-accent/60" />
               <p className="text-base sm:text-lg text-primary-deep font-body leading-relaxed max-w-md">
-                Traditional recipes. <br /> Premium ingredients.<br />
-                Handcrafted with care <br /> in Houston.
+                Authentic Bangladeshi Mishti & Pithas <br />
+                Luxury dessert tables, party trays, <br /> and bulk gift boxes for weddings, <br /> engagements, and special events.
               </p>
             </motion.div>
 
