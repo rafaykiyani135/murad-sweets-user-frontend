@@ -990,6 +990,10 @@ export default function HistoryPage() {
   const [activeTab, setActiveTab] = useState<'orders' | 'stock' | 'delivery' | 'products'>('orders');
   const [orderFilter, setOrderFilter] = useState('all');
 
+  // Date range filter
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+
   // Search & Sorting States
   const [orderQuery, setOrderQuery] = useState('');
   const [stockQuery, setStockQuery] = useState('');
@@ -1027,10 +1031,14 @@ export default function HistoryPage() {
     setTimeout(() => setToast(null), 3500);
   };
 
-  const fetchOrders = async () => {
+  const fetchOrders = async (start?: string, end?: string) => {
     setLoadingOrders(true);
     try {
-      const res = await api.get('/history/orders');
+      const params = new URLSearchParams();
+      if (start) params.set('start_date', start);
+      if (end) params.set('end_date', end);
+      const query = params.toString() ? `?${params.toString()}` : '';
+      const res = await api.get(`/history/orders${query}`);
       setOrders(res.data);
     } catch {
       showToast('Failed to load orders.', 'error');
@@ -1080,6 +1088,13 @@ export default function HistoryPage() {
       fetchDeliverySettings();
     }
   }, [authChecked]);
+
+  // Refetch orders when date range changes
+  useEffect(() => {
+    if (authChecked) {
+      fetchOrders(startDate || undefined, endDate || undefined);
+    }
+  }, [startDate, endDate]);
 
   const handleLogout = async () => {
     try {
@@ -1413,7 +1428,7 @@ export default function HistoryPage() {
           <div>
 
             {/* Filter and Search Bar */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
               <div className="flex flex-row overflow-x-auto no-scrollbar w-full md:w-auto gap-2 pb-1">
                 {['all', 'pending', 'confirmed', 'preparing', 'ready', 'out_for_delivery', 'completed', 'cancelled'].map(f => (
                   <button
@@ -1445,6 +1460,61 @@ export default function HistoryPage() {
                 }}
                 className="w-full md:max-w-[320px]"
               />
+            </div>
+
+            {/* Date Range Filter */}
+            <div style={{
+              display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '12px',
+              background: '#FFF', border: '1px solid #E8C8C8', borderRadius: '12px',
+              padding: '14px 18px', marginBottom: '20px',
+              boxShadow: '0 2px 8px rgba(74,15,23,0.04)'
+            }}>
+              <span style={{ fontSize: '13px', fontWeight: 700, color: '#4A0F17', letterSpacing: '0.04em', fontFamily: 'var(--font-subheading)', whiteSpace: 'nowrap' }}>
+                📅 Date Range
+              </span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                <label style={{ fontSize: '12px', color: '#8A5A2B', fontWeight: 600 }}>From</label>
+                <input
+                  type="date"
+                  value={startDate}
+                  max={endDate || undefined}
+                  onChange={e => setStartDate(e.target.value)}
+                  style={{
+                    padding: '7px 12px', borderRadius: '8px', border: '1px solid #E8C8C8',
+                    outline: 'none', background: '#FAF6F0', color: '#4A0F17',
+                    fontSize: '13px', fontWeight: 500, cursor: 'pointer'
+                  }}
+                />
+                <label style={{ fontSize: '12px', color: '#8A5A2B', fontWeight: 600 }}>To</label>
+                <input
+                  type="date"
+                  value={endDate}
+                  min={startDate || undefined}
+                  onChange={e => setEndDate(e.target.value)}
+                  style={{
+                    padding: '7px 12px', borderRadius: '8px', border: '1px solid #E8C8C8',
+                    outline: 'none', background: '#FAF6F0', color: '#4A0F17',
+                    fontSize: '13px', fontWeight: 500, cursor: 'pointer'
+                  }}
+                />
+              </div>
+              {(startDate || endDate) && (
+                <button
+                  onClick={() => { setStartDate(''); setEndDate(''); }}
+                  style={{
+                    padding: '7px 16px', borderRadius: '8px', border: '1px solid #E8C8C8',
+                    background: '#FFF4EE', color: '#7B1E2B', fontSize: '12px',
+                    fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s'
+                  }}
+                >
+                  ✕ Clear Filter
+                </button>
+              )}
+              {(startDate || endDate) && (
+                <span style={{ fontSize: '12px', color: '#8A5A2B', marginLeft: 'auto', fontStyle: 'italic' }}>
+                  Showing {orders.length} order{orders.length !== 1 ? 's' : ''} in range
+                </span>
+              )}
             </div>
 
             {loadingOrders ? (

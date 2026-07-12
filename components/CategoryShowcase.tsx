@@ -11,7 +11,7 @@ const items = [
     description: 'A classic rich and caramelized Bengali sweet, deeply satisfying and soaked in sweet syrup.',
     features: [],
     iconImage: '/Icons/IconRowTwo.png',
-    image: '/BrownChomChom.png',
+    image: '/BrownChomChom.webp',
     type: 'image-row'
   },
   {
@@ -20,7 +20,7 @@ const items = [
     description: 'Soft, spongy, and delicately sweet, these traditional white treats are a timeless favorite.',
     features: [],
     iconImage: '/Icons/IconRowThree.png',
-    image: '/WhiteChomChom.png',
+    image: '/WhiteChomChom.webp',
     type: 'image-row'
   },
   {
@@ -29,7 +29,7 @@ const items = [
     description: 'Deep-fried to a beautiful dark color, our KaloJam offers a rich, dense texture bursting with flavor.',
     features: [],
     iconImage: '/Icons/IconRow4.png',
-    image: '/KaloJam.png',
+    image: '/KaloJam.webp',
     type: 'image-row'
   },
   {
@@ -38,7 +38,7 @@ const items = [
     description: 'A majestic, saffron-infused spongy sweet filled with premium nuts and cardamom.',
     features: [],
     iconImage: '/Icons/IconRowOne.png',
-    image: '/RajBhog.png',
+    image: '/RajBhog.webp',
     type: 'image-row'
   },
   {
@@ -47,7 +47,7 @@ const items = [
     description: 'An elegant presentation of classic Kala Jamun, beautifully layered with rich malai cream.',
     features: [],
     iconImage: '/Icons/IconRowTwo.png',
-    image: '/KalujamSandwich.png',
+    image: '/KalujamSandwich.webp',
     type: 'image-row'
   },
   {
@@ -56,7 +56,7 @@ const items = [
     description: 'Perfectly round and irresistibly sweet, our laddus melt in your mouth with every bite.',
     features: [],
     iconImage: '/Icons/IconRowThree.png',
-    image: '/Laddu.png',
+    image: '/Laddu.webp',
     type: 'image-row'
   },
   {
@@ -65,7 +65,7 @@ const items = [
     description: 'A premium regional delicacy known for its unique texture and authentic, rich taste.',
     features: [],
     iconImage: '/Icons/IconRow4.png',
-    image: '/KatariBhog.png',
+    image: '/KatariBhog.webp',
     type: 'image-row'
   },
   {
@@ -74,7 +74,7 @@ const items = [
     description: 'Luxuriously soft sweets drenched in a thickened, sweetened milk infused with cardamom.',
     features: [],
     iconImage: '/Icons/IconRowOne.png',
-    image: '/MalaiKari.png',
+    image: '/MalaiKari.webp',
     type: 'image-row'
   },
   {
@@ -83,7 +83,7 @@ const items = [
     description: 'A delicate milk-based sweet, perfectly balanced and adorned with a touch of tradition.',
     features: [],
     iconImage: '/Icons/IconRowTwo.png',
-    image: '/Shandesh.png',
+    image: '/Shandesh.webp',
     type: 'image-row'
   },
   {
@@ -92,7 +92,7 @@ const items = [
     description: 'Golden, soft, and warm, soaking in a fragrant rose and cardamom syrup.',
     features: [],
     iconImage: '/Icons/IconRowThree.png',
-    image: '/GulabJamun.png',
+    image: '/GulabJamun.webp',
     type: 'image-row'
   }
 ];

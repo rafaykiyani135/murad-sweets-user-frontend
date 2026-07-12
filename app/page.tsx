@@ -12,17 +12,17 @@ export default function Home() {
       {/* 1. HERO SECTION */}
       <section className="relative min-h-[90vh] md:min-h-[85vh] flex items-center justify-start pt-28 pb-12 md:py-20 overflow-hidden">
         {/* Background Image */}
-        <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 z-0 overflow-hidden">
           <Image
-            src="/HeroSectionImageVersion2.png"
+            src="/HeroSectionImageVersion2.webp"
 
             alt="Murad Sweets Background"
             fill
             priority
-            className="hidden sm:block object-cover object-center"
+            className="hidden sm:block object-cover object-right scale-[1.2] translate-x-[8%]"
           />
           <Image
-            src="/HeroSectionPhoneViewVersion3.png"
+            src="/HeroSectionPhoneViewVersion3.webp"
             alt="Murad Sweets Background Mobile"
             fill
             priority
@@ -31,7 +31,7 @@ export default function Home() {
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10">
-          <div className="w-[65%] sm:w-full max-w-2xl space-y-8 text-left">
+          <div className="w-[65%] sm:w-[55%] md:w-[50%] lg:w-[45%] max-w-xl space-y-8 text-left">
             <motion.div
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}

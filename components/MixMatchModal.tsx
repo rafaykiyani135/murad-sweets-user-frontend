@@ -9,9 +9,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 
 const BOX_IMAGES = {
-  3: 'https://items-images-production-f.squarecdn.com/files/9ba888a143b397cf4ab2deda5c727d5bb80f8da9/original.jpeg?width=512&crop=1%3A1&format=webp',
-  6: 'https://items-images-production-f.squarecdn.com/files/fc1de58a35a7f9872d30cbc5cd86239cda863980/original.jpeg?width=512&crop=1%3A1&format=webp',
-  9: 'https://items-images-production-f.squarecdn.com/files/eac57c2d50106f70c33ea9f1caee98d15bf707e7/original.jpeg?width=512&crop=1%3A1&format=webp',
+  3: '/3-piece-box.webp',
+  6: '/6-piece-box.webp',
+  9: '/9-piece-box.webp',
 } as const;
 
 export default function MixMatchModal() {
