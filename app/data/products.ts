@@ -12,6 +12,7 @@ export type Product = {
   minOrderQty?: number;  // for Pitha (10)
   isMixMatch?: boolean;  // for Dry Sweets box
   product_type?: string;
+  bundle_items?: { id: string; quantity: number; name?: string }[];
 };
 
 export const PRODUCTS: Product[] = [

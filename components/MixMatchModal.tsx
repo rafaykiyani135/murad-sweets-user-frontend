@@ -30,7 +30,17 @@ export default function MixMatchModal() {
   // Filter available dry sweets that are in stock (excluding mix and match boxes)
   const excludedForPartyTray = ['peda', 'kalojam-sandwich', 'kathari-bhog', 'kheer-mouchak'];
   const drySweets = PRODUCTS.filter((p) => {
-    if (p.category !== 'dry-sweets' || !p.inStock || p.product_type === 'custom_box') return false;
+    if (p.product_type === 'custom_box' || !p.inStock) return false;
+    
+    // Check if the admin explicitly configured this item
+    const bundleConfig = mixMatchProduct?.bundle_items?.find(bi => bi.id === p.id);
+    if (isPartyTray && bundleConfig) {
+      if (bundleConfig.quantity === 0) return false; // Explicitly excluded
+      return true; // Explicitly included
+    }
+
+    // Default logic for party trays and mix match boxes
+    if (p.category !== 'dry-sweets') return false;
     if (isPartyTray && excludedForPartyTray.includes(p.slug)) return false;
     return true;
   });

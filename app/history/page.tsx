@@ -694,10 +694,11 @@ function AddOrderModal({
       const prod = products.find(p => p.id === item.product_id);
       if (prod?.product_type === 'custom_box') {
         const totalSelected = item.selections.reduce((acc, s) => acc + s.quantity, 0);
-        let boxSize = 3;
+        let boxSize = 0;
+        if (prod.slug.includes('3')) boxSize = 3;
         if (prod.slug.includes('6')) boxSize = 6;
         if (prod.slug.includes('9')) boxSize = 9;
-        if (totalSelected !== boxSize) {
+        if (boxSize > 0 && totalSelected !== boxSize) {
           setError(`Custom box ${prod.name} must have exactly ${boxSize} items selected.`);
           return;
         }
@@ -732,7 +733,11 @@ function AddOrderModal({
     }
   };
 
-  const drySweets = products.filter(p => p.category_id === categories.find(c => c.slug === 'dry-sweets')?.id);
+  const selectableSweets = products.filter(p => 
+    p.product_type !== 'custom_box' && 
+    !p.slug.includes('mixmatch') &&
+    !p.slug.includes('party-tray')
+  );
 
   const inputStyle = {
     padding: '12px', borderRadius: '8px', background: '#FFF',
@@ -775,7 +780,8 @@ function AddOrderModal({
         {items.map((item, idx) => {
           const selectedProduct = products.find(p => p.id === item.product_id);
           const isCustomBox = selectedProduct?.product_type === 'custom_box';
-          let boxSize = 3;
+          let boxSize = 0;
+          if (selectedProduct?.slug.includes('3')) boxSize = 3;
           if (selectedProduct?.slug.includes('6')) boxSize = 6;
           if (selectedProduct?.slug.includes('9')) boxSize = 9;
 
@@ -828,7 +834,9 @@ function AddOrderModal({
               {/* Sub-selections for custom boxes */}
               {isCustomBox && (
                 <div style={{ padding: '16px', background: '#FAF6F0', borderRadius: '8px', border: '1px dashed #E8C8C8' }}>
-                  <h5 style={{ margin: '0 0 12px', color: '#8A5A2B', fontSize: '14px', fontWeight: 600 }}>Select {boxSize} Items ({totalSelected}/{boxSize} selected)</h5>
+                  <h5 style={{ margin: '0 0 12px', color: '#8A5A2B', fontSize: '14px', fontWeight: 600 }}>
+                    {boxSize > 0 ? `Select ${boxSize} Items (${totalSelected}/${boxSize} selected)` : `Select Items (${totalSelected} selected)`}
+                  </h5>
                   {item.selections.map((sel, sIdx) => (
                     <div key={sIdx} style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '8px' }}>
                       <select
@@ -841,7 +849,7 @@ function AddOrderModal({
                         style={{ ...inputStyle, flex: 1, padding: '8px' }}
                       >
                         <option value="">Select sweet...</option>
-                        {drySweets.map(ds => <option key={ds.id} value={ds.id}>{ds.name}</option>)}
+                        {selectableSweets.map(sw => <option key={sw.id} value={sw.id}>{sw.name}</option>)}
                       </select>
                       <input
                         type="number" min={1} value={sel.quantity}
@@ -927,21 +935,115 @@ function AddProductRow({ categoryId, onSave, onCancel }: { categoryId: string; o
   const [price, setPrice] = useState('');
   const [description, setDescription] = useState('');
   const [unitLabel, setUnitLabel] = useState('');
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [uploadError, setUploadError] = useState('');
   const [saving, setSaving] = useState(false);
   const inp = { padding: '8px 10px', borderRadius: '6px', border: '1px solid #E8C8C8', background: '#FFF', color: '#4A0F17', outline: 'none' };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImageFile(file);
+    setUploadError('');
+    const reader = new FileReader();
+    reader.onloadend = () => setImagePreview(reader.result as string);
+    reader.readAsDataURL(file);
+  };
+
+  const handleSave = async () => {
+    if (!name || !price) return;
+    setSaving(true);
+    setUploadError('');
+    try {
+      // 1. Upload image first (if user selected one), get actual saved path back
+      let imagePath: string | null = null;
+      if (imageFile) {
+        const formData = new FormData();
+        formData.append('file', imageFile);
+        formData.append('name', name);
+        const uploadRes = await fetch('/api/upload-image', { method: 'POST', body: formData });
+        if (!uploadRes.ok) {
+          const err = await uploadRes.json();
+          setUploadError(err.error ?? 'Image upload failed.');
+          setSaving(false);
+          return;
+        }
+        const uploadData = await uploadRes.json();
+        // Use the exact path returned by the server — it's always .webp
+        imagePath = uploadData.publicPath;
+      }
+      // 2. Save product to DB — include image path in metadata so catalog API returns it
+      await onSave({
+        name,
+        description,
+        base_price_cents: Math.round(parseFloat(price) * 100),
+        unit_label: unitLabel || null,
+        ...(imagePath ? { metadata: { images: [imagePath] } } : {}),
+      });
+    } catch {
+      setUploadError('Failed to save product.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const fileName = name.replace(/\s+/g, '');
+
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px', borderRadius: '10px', background: '#F0FAF4', border: '1px dashed #10B981', flexWrap: 'wrap' }}>
-      <input value={name} onChange={e => setName(e.target.value)} placeholder="Product name *" style={{ ...inp, flex: 2, minWidth: '150px' }} />
-      <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><span style={{ color: '#8A5A2B', fontWeight: 700 }}>$</span><input type="number" value={price} onChange={e => setPrice(e.target.value)} placeholder="Price" style={{ ...inp, width: '90px' }} /></div>
-      <input value={unitLabel} onChange={e => setUnitLabel(e.target.value)} placeholder="Unit (e.g. lb, box)" style={{ ...inp, width: '130px' }} />
-      <input value={description} onChange={e => setDescription(e.target.value)} placeholder="Description" style={{ ...inp, flex: 3, minWidth: '180px' }} />
-      <button disabled={!name || !price || saving} onClick={async () => { setSaving(true); await onSave({ name, description, base_price_cents: Math.round(parseFloat(price) * 100), unit_label: unitLabel || null }); setSaving(false); }} style={{ padding: '8px 16px', borderRadius: '6px', border: 'none', background: '#10B981', color: '#FFF', fontWeight: 700, cursor: 'pointer', opacity: (!name || !price) ? 0.5 : 1 }}>{saving ? '...' : 'Add'}</button>
-      <button onClick={onCancel} style={{ padding: '8px 14px', borderRadius: '6px', border: '1px solid #E8C8C8', background: '#FFF', color: '#8A5A2B', cursor: 'pointer' }}>Cancel</button>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', padding: '14px', borderRadius: '10px', background: '#F0FAF4', border: '1px dashed #10B981' }}>
+      {/* Row 1: core fields */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+        <input value={name} onChange={e => setName(e.target.value)} placeholder="Product name *" style={{ ...inp, flex: 2, minWidth: '150px' }} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <span style={{ color: '#8A5A2B', fontWeight: 700 }}>$</span>
+          <input type="number" value={price} onChange={e => setPrice(e.target.value)} placeholder="Price *" style={{ ...inp, width: '90px' }} />
+        </div>
+        <input value={unitLabel} onChange={e => setUnitLabel(e.target.value)} placeholder="Unit (e.g. lb, box)" style={{ ...inp, width: '130px' }} />
+        <input value={description} onChange={e => setDescription(e.target.value)} placeholder="Description" style={{ ...inp, flex: 3, minWidth: '180px' }} />
+      </div>
+
+      {/* Row 2: image upload */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap', padding: '10px 12px', background: '#FFF', borderRadius: '8px', border: '1px solid #D1FAE5' }}>
+        <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', padding: '6px 14px', border: '1px solid #10B981', borderRadius: '6px', background: '#ECFDF5', color: '#065F46', fontSize: '13px', fontWeight: 600, whiteSpace: 'nowrap' }}>
+          📷 {imageFile ? 'Change Image' : 'Upload Image'}
+          <input type="file" accept="image/*" onChange={handleImageChange} style={{ display: 'none' }} />
+        </label>
+        {imagePreview ? (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <img src={imagePreview} alt="Preview" style={{ width: '44px', height: '44px', objectFit: 'cover', borderRadius: '6px', border: '1px solid #A7F3D0' }} />
+            <div>
+              <p style={{ margin: 0, fontSize: '12px', fontWeight: 700, color: '#065F46' }}>
+                Will save as: <code style={{ background: '#D1FAE5', padding: '1px 5px', borderRadius: '3px' }}>{fileName || '[name]'}.webp</code>
+              </p>
+              <p style={{ margin: '2px 0 0', fontSize: '11px', color: '#6B7280' }}>Auto-converted to WebP</p>
+            </div>
+            <button
+              onClick={() => { setImageFile(null); setImagePreview(null); }}
+              style={{ padding: '3px 8px', borderRadius: '4px', border: '1px solid #FECACA', background: '#FEF2F2', color: '#991B1B', fontSize: '11px', cursor: 'pointer', fontWeight: 700, marginLeft: 'auto' }}
+            >✕ Remove</button>
+          </div>
+        ) : (
+          <span style={{ fontSize: '12px', color: '#8A5A2B' }}>Optional — any format accepted, saved as WebP</span>
+        )}
+      </div>
+
+      {uploadError && <p style={{ margin: 0, fontSize: '12px', color: '#991B1B', fontWeight: 600 }}>⚠️ {uploadError}</p>}
+
+      {/* Row 3: actions */}
+      <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+        <button onClick={onCancel} style={{ padding: '8px 14px', borderRadius: '6px', border: '1px solid #E8C8C8', background: '#FFF', color: '#8A5A2B', cursor: 'pointer', fontWeight: 600 }}>Cancel</button>
+        <button
+          disabled={!name || !price || saving}
+          onClick={handleSave}
+          style={{ padding: '8px 20px', borderRadius: '6px', border: 'none', background: '#10B981', color: '#FFF', fontWeight: 700, cursor: 'pointer', opacity: (!name || !price || saving) ? 0.6 : 1 }}
+        >{saving ? 'Saving...' : 'Add Product'}</button>
+      </div>
     </div>
   );
 }
 
-function EditProductRow({ prod, categories, onSave, onCancel }: { prod: any; categories: any[]; onSave: (d: any) => Promise<void>; onCancel: () => void }) {
+function EditProductRow({ prod, categories, allProducts, onSave, onCancel }: { prod: any; categories: any[]; allProducts?: any[]; onSave: (d: any) => Promise<void>; onCancel: () => void }) {
   const [name, setName] = useState(prod.name);
   const [price, setPrice] = useState((prod.base_price_cents / 100).toFixed(2));
   const [description, setDescription] = useState(prod.description || '');
@@ -949,8 +1051,35 @@ function EditProductRow({ prod, categories, onSave, onCancel }: { prod: any; cat
   const [isActive, setIsActive] = useState(prod.is_active);
   const [isInStock, setIsInStock] = useState(prod.is_in_stock);
   const [categoryId, setCategoryId] = useState(prod.category_id || '');
+  const [bundleItems, setBundleItems] = useState<{id: string, quantity: number}[]>(prod.metadata?.bundle_items || []);
   const [saving, setSaving] = useState(false);
+  
+  // Image editing state
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [uploadError, setUploadError] = useState('');
+
   const inp = { padding: '8px 10px', borderRadius: '6px', border: '1px solid #E8C8C8', background: '#FFF', color: '#4A0F17', outline: 'none' };
+  
+  const selectableSweets = allProducts?.filter((p: any) => 
+    p.product_type !== 'custom_box' && 
+    !p.slug?.includes('mixmatch') &&
+    !p.slug?.includes('party-tray')
+  ) || [];
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImageFile(file);
+    setUploadError('');
+    const reader = new FileReader();
+    reader.onloadend = () => setImagePreview(reader.result as string);
+    reader.readAsDataURL(file);
+  };
+
+  const fileName = name.replace(/\s+/g, '');
+  const currentImage = prod.metadata?.images?.[0];
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', padding: '16px', borderRadius: '10px', background: '#FAFAF0', border: '1px solid #c9a84c' }}>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center' }}>
@@ -962,6 +1091,63 @@ function EditProductRow({ prod, categories, onSave, onCancel }: { prod: any; cat
         </select>
       </div>
       <input value={description} onChange={e => setDescription(e.target.value)} placeholder="Description" style={{ ...inp, width: '100%' }} />
+      
+      {/* Image upload section */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap', padding: '10px 12px', background: '#FFF', borderRadius: '8px', border: '1px solid #E8C8C8' }}>
+        <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', padding: '6px 14px', border: '1px solid #7B1E2B', borderRadius: '6px', background: '#FFF4EE', color: '#7B1E2B', fontSize: '13px', fontWeight: 600, whiteSpace: 'nowrap' }}>
+          📷 {imageFile ? 'Change New Image' : (currentImage ? 'Replace Image' : 'Upload Image')}
+          <input type="file" accept="image/*" onChange={handleImageChange} style={{ display: 'none' }} />
+        </label>
+        
+        {imagePreview ? (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <img src={imagePreview} alt="Preview" style={{ width: '44px', height: '44px', objectFit: 'cover', borderRadius: '6px', border: '1px solid #E8C8C8' }} />
+            <div>
+              <p style={{ margin: 0, fontSize: '12px', fontWeight: 700, color: '#4A0F17' }}>New Image Ready</p>
+              <p style={{ margin: '2px 0 0', fontSize: '11px', color: '#8A5A2B' }}>Will be converted to WebP</p>
+            </div>
+            <button
+              onClick={() => { setImageFile(null); setImagePreview(null); }}
+              style={{ padding: '3px 8px', borderRadius: '4px', border: '1px solid #E8C8C8', background: '#FFF', color: '#4A0F17', fontSize: '11px', cursor: 'pointer', fontWeight: 600, marginLeft: 'auto' }}
+            >✕ Cancel Change</button>
+          </div>
+        ) : currentImage ? (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <img src={currentImage} alt="Current" style={{ width: '44px', height: '44px', objectFit: 'cover', borderRadius: '6px', border: '1px solid #E8C8C8' }} />
+            <span style={{ fontSize: '12px', color: '#8A5A2B' }}>Current Image</span>
+          </div>
+        ) : (
+          <span style={{ fontSize: '12px', color: '#8A5A2B' }}>No image currently.</span>
+        )}
+      </div>
+      {uploadError && <p style={{ margin: 0, fontSize: '12px', color: '#991B1B', fontWeight: 600 }}>⚠️ {uploadError}</p>}
+
+      {prod.product_type === 'custom_box' && (
+        <div style={{ padding: '12px', background: '#FFF', borderRadius: '8px', border: '1px dashed #c9a84c' }}>
+          <h5 style={{ margin: '0 0 4px', color: '#8A5A2B', fontSize: '13px', fontWeight: 700 }}>ADDITIONAL MIX & MATCH OPTIONS</h5>
+          <p style={{ margin: '0 0 10px', fontSize: '11px', color: '#A0927A' }}>Add items to allow them in this box. To <b>exclude</b> a default sweet, add it with quantity <b>0</b>.</p>
+          {bundleItems.map((bi, idx) => (
+            <div key={idx} style={{ display: 'flex', gap: '8px', marginBottom: '8px', flexWrap: 'wrap' }}>
+              <select value={bi.id} onChange={e => {
+                const newItems = [...bundleItems];
+                newItems[idx].id = e.target.value;
+                setBundleItems(newItems);
+              }} style={{ ...inp, flex: 1, minWidth: '150px' }}>
+                <option value="">Select Mithayi...</option>
+                {selectableSweets.map((sw: any) => <option key={sw.id} value={sw.id}>{sw.name}</option>)}
+              </select>
+              <input type="number" min={0} value={bi.quantity} onChange={e => {
+                const newItems = [...bundleItems];
+                newItems[idx].quantity = parseInt(e.target.value) || 0;
+                setBundleItems(newItems);
+              }} style={{ ...inp, width: '70px' }} title="Set to 0 to exclude this item" />
+              <button onClick={() => setBundleItems(bundleItems.filter((_, i) => i !== idx))} style={{ padding: '0 12px', background: '#FFF4EE', color: '#7B1E2B', border: '1px solid #E8C8C8', borderRadius: '6px', cursor: 'pointer' }}>X</button>
+            </div>
+          ))}
+          <button onClick={() => setBundleItems([...bundleItems, { id: '', quantity: 1 }])} style={{ padding: '6px 12px', borderRadius: '6px', border: '1px solid #E8C8C8', background: '#FFF', color: '#4A0F17', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}>+ Add Item</button>
+        </div>
+      )}
+
       <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap' }}>
         <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: '#4A0F17', fontWeight: 600, cursor: 'pointer' }}><input type="checkbox" checked={isActive} onChange={e => setIsActive(e.target.checked)} /> Active</label>
         <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: '#4A0F17', fontWeight: 600, cursor: 'pointer' }}><input type="checkbox" checked={isInStock} onChange={e => setIsInStock(e.target.checked)} /> In Stock</label>
@@ -969,10 +1155,42 @@ function EditProductRow({ prod, categories, onSave, onCancel }: { prod: any; cat
           <button onClick={onCancel} style={{ padding: '8px 14px', borderRadius: '6px', border: '1px solid #E8C8C8', background: '#FFF', color: '#8A5A2B', cursor: 'pointer' }}>Cancel</button>
           <button disabled={saving} onClick={async () => {
             setSaving(true);
-            const updates: any = { name, description, base_price_cents: Math.round(parseFloat(price) * 100), unit_label: unitLabel || null, is_active: isActive, is_in_stock: isInStock };
-            if (categoryId && categoryId !== prod.category_id) updates.category_id = categoryId;
-            await onSave(updates);
-            setSaving(false);
+            setUploadError('');
+            try {
+              let newImagePath: string | null = null;
+              if (imageFile) {
+                const formData = new FormData();
+                formData.append('file', imageFile);
+                formData.append('name', name);
+                const uploadRes = await fetch('/api/upload-image', { method: 'POST', body: formData });
+                if (!uploadRes.ok) {
+                  const err = await uploadRes.json();
+                  setUploadError(err.error ?? 'Image upload failed.');
+                  setSaving(false);
+                  return;
+                }
+                const uploadData = await uploadRes.json();
+                newImagePath = uploadData.publicPath;
+              }
+
+              const updates: any = { name, description, base_price_cents: Math.round(parseFloat(price) * 100), unit_label: unitLabel || null, is_active: isActive, is_in_stock: isInStock };
+              if (categoryId && categoryId !== prod.category_id) updates.category_id = categoryId;
+              
+              const existingMeta = prod.metadata || {};
+              updates.metadata = { ...existingMeta };
+              if (newImagePath) {
+                updates.metadata.images = [newImagePath];
+              }
+              if (prod.product_type === 'custom_box') {
+                updates.metadata.bundle_items = bundleItems.filter(i => i.id);
+              }
+              
+              await onSave(updates);
+            } catch (err) {
+               setUploadError('Failed to save product.');
+            } finally {
+               setSaving(false);
+            }
           }} style={{ padding: '8px 20px', borderRadius: '6px', border: 'none', background: '#7B1E2B', color: '#FFF', fontWeight: 700, cursor: 'pointer' }}>{saving ? 'Saving...' : 'Save Changes'}</button>
         </div>
       </div>
@@ -1117,10 +1335,21 @@ export default function HistoryPage() {
     }
   };
 
-  const handleDeleteProduct = async (productId: string) => {
+  const handleDeleteProduct = async (productId: string, productName: string) => {
     if (!confirm('Delete this product? This cannot be undone.')) return;
     try {
+      // 1. Delete from database
       await api.delete(`/admin/products/products/${productId}`);
+      // 2. Best-effort image deletion — don't block UI if file is missing
+      try {
+        await fetch('/api/delete-image', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: productName }),
+        });
+      } catch {
+        // Image deletion is non-critical — silently ignore
+      }
       showToast('Product deleted.');
       fetchCategories();
     } catch {
@@ -1827,7 +2056,7 @@ export default function HistoryPage() {
                         {cat.products.map((prod, prodIdx) => (
                           <div key={prod.id}>
                             {editingProduct?.id === prod.id ? (
-                              <EditProductRow prod={editingProduct} categories={categories} onSave={async (updates) => {
+                              <EditProductRow prod={editingProduct} categories={categories} allProducts={categories.flatMap(c => c.products)} onSave={async (updates) => {
                                 await api.patch(`/admin/products/products/${prod.id}`, updates);
                                 showToast('Product updated.'); setEditingProduct(null); fetchCategories();
                               }} onCancel={() => setEditingProduct(null)} />
@@ -1864,7 +2093,7 @@ export default function HistoryPage() {
                                 </div>
                                 <div className="flex gap-2 w-full sm:w-auto border-t sm:border-0 border-[#E8C8C8] pt-3 sm:pt-0 mt-1 sm:mt-0">
                                   <button onClick={() => setEditingProduct(prod)} className="flex-1 sm:flex-none" style={{ padding: '5px 12px', borderRadius: '6px', border: '1px solid #E8C8C8', background: '#FFF', color: '#4A0F17', fontSize: '12px', cursor: 'pointer' }}>Edit</button>
-                                  <button onClick={() => handleDeleteProduct(prod.id)} className="flex-1 sm:flex-none" style={{ padding: '5px 12px', borderRadius: '6px', border: 'none', background: '#EF4444', color: '#FFF', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}>Delete</button>
+                                  <button onClick={() => handleDeleteProduct(prod.id, prod.name)} className="flex-1 sm:flex-none" style={{ padding: '5px 12px', borderRadius: '6px', border: 'none', background: '#EF4444', color: '#FFF', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}>Delete</button>
                                 </div>
                               </div>
                             )}
