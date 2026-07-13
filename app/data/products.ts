@@ -13,6 +13,7 @@ export type Product = {
   isMixMatch?: boolean;  // for Dry Sweets box
   product_type?: string;
   bundle_items?: { id: string; quantity: number; name?: string }[];
+  quantityOnHand?: number | null;
 };
 
 export const PRODUCTS: Product[] = [

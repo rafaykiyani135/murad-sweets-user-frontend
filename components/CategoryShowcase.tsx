@@ -221,7 +221,6 @@ export default function CategoryShowcase() {
                   alt={item.title}
                   fill
                   className="object-cover"
-                  quality={100}
                   sizes="100vw"
                   priority={index <= 1} // Prioritize loading for the first two images
                 />

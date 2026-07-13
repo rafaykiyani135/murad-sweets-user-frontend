@@ -275,7 +275,7 @@ function CatalogContent() {
     }));
 
   useEffect(() => {
-    fetchCatalog();
+    fetchCatalog(true);
   }, [fetchCatalog]);
 
   // Sync active tab from URL or default to first category when catalog loads

@@ -1,10 +1,12 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { X, Plus, Minus, Trash2, ShoppingBag, Truck, MapPin } from 'lucide-react';
+import { X, Plus, Minus, Trash2, ShoppingBag, Truck, MapPin, AlertTriangle } from 'lucide-react';
 import { useCart } from '@/app/store/useCart';
+import { useCatalog } from '@/app/store/useCatalog';
 import { useFulfillmentStore } from '@/app/store/fulfillmentStore';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -25,9 +27,87 @@ export default function CartDrawer() {
   const deliveryFee = deliveryFeeCents !== null ? deliveryFeeCents / 100 : 0;
   const total = subtotal + (orderType === 'delivery' ? deliveryFee : 0);
 
-  const handleCheckoutClick = () => {
-    setCartOpen(false);
-    router.push('/checkout');
+  const [stockErrors, setStockErrors] = useState<string[]>([]);
+  const [isValidating, setIsValidating] = useState(false);
+  const { products: PRODUCTS, fetchCatalog } = useCatalog();
+
+  const handleCheckoutClick = async () => {
+    setIsValidating(true);
+    try {
+      // 1. Fetch the latest live catalog
+      await fetchCatalog(true);
+      const latestProducts = useCatalog.getState().products;
+
+      // 2. Aggregate demanded quantity of each sweet in cart
+      const demanded: { [productId: string]: number } = {};
+      const productMap: { [productId: string]: any } = {};
+      latestProducts.forEach((p) => {
+        productMap[p.id] = p;
+      });
+
+      for (const item of cartItems) {
+        // Standard non-custom items
+        if (!item.mixMatch && !item.assortedBox) {
+          demanded[item.productId] = (demanded[item.productId] || 0) + item.quantity;
+        }
+        // Mix & Match selections (MixMatchModal)
+        else if (item.mixMatch) {
+          for (const sel of item.mixMatch.selectedItems) {
+            demanded[sel.id] = (demanded[sel.id] || 0) + (sel.quantity * item.quantity);
+          }
+        }
+        // Assorted selections (CollectionModal)
+        else if (item.assortedBox) {
+          for (const sel of item.assortedBox.selectedItems) {
+            // Find product in dry-sweets category by name
+            const match = latestProducts.find(
+              (p) => p.name === sel.name && p.category === 'dry-sweets'
+            );
+            if (match) {
+              demanded[match.id] = (demanded[match.id] || 0) + (1 * item.quantity);
+            }
+          }
+        }
+      }
+
+      // 3. Check demands against stock levels
+      const errors: string[] = [];
+      for (const prodId of Object.keys(demanded)) {
+        const product = productMap[prodId];
+        if (!product) continue;
+
+        const totalDemanded = demanded[prodId];
+
+        // Check if completely out of stock
+        if (!product.inStock) {
+          errors.push(`"${product.name}" is out of stock.`);
+          continue;
+        }
+
+        // Check quantity limit if tracked
+        if (product.quantityOnHand !== undefined && product.quantityOnHand !== null) {
+          if (product.quantityOnHand < totalDemanded) {
+            errors.push(
+              `Only ${product.quantityOnHand} left of "${product.name}" (you requested ${totalDemanded}).`
+            );
+          }
+        }
+      }
+
+      if (errors.length > 0) {
+        setStockErrors(errors);
+      } else {
+        setCartOpen(false);
+        router.push('/checkout');
+      }
+    } catch (err) {
+      console.error('Failed to validate stock before checkout', err);
+      // Fallback: let checkout process normally if API fails
+      setCartOpen(false);
+      router.push('/checkout');
+    } finally {
+      setIsValidating(false);
+    }
   };
 
   const handleBrowseClick = () => {
@@ -234,9 +314,19 @@ export default function CartDrawer() {
                 <div className="space-y-2 pt-1">
                   <button
                     onClick={handleCheckoutClick}
-                    className="w-full btn-gold py-3 text-xs uppercase tracking-widest"
+                    disabled={isValidating}
+                    className={`w-full btn-gold py-3 text-xs uppercase tracking-widest flex items-center justify-center gap-2 ${
+                      isValidating ? 'opacity-75 cursor-wait' : ''
+                    }`}
                   >
-                    Proceed to Checkout
+                    {isValidating ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-cream border-t-transparent rounded-full animate-spin" />
+                        Validating Stock...
+                      </>
+                    ) : (
+                      'Proceed to Checkout'
+                    )}
                   </button>
                   <button
                     onClick={() => setCartOpen(false)}
@@ -249,6 +339,31 @@ export default function CartDrawer() {
             )}
           </motion.div>
         </>
+      )}
+      {/* Stock adjustment required popup modal */}
+      {stockErrors.length > 0 && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4">
+          <div className="bg-white rounded-xl max-w-sm w-full p-6 shadow-2xl border border-border flex flex-col space-y-4">
+            <div className="flex items-center gap-2.5 text-primary">
+              <AlertTriangle className="h-6 w-6 text-accent animate-bounce" />
+              <h3 className="font-cinzel text-base font-bold text-[#4A0F17]">Stock Adjustment Needed</h3>
+            </div>
+            <p className="text-xs text-brown font-body leading-relaxed">
+              Some items in your cart exceed our current available stock. Please adjust your selections:
+            </p>
+            <ul className="list-disc list-inside space-y-1 text-xs text-red-600 font-semibold font-body bg-blush/20 p-2.5 rounded border border-[#E8C8C8]">
+              {stockErrors.map((err, idx) => (
+                <li key={idx}>{err}</li>
+              ))}
+            </ul>
+            <button
+              onClick={() => setStockErrors([])}
+              className="w-full btn-gold py-2 text-xs uppercase tracking-widest"
+            >
+              Go Back & Edit
+            </button>
+          </div>
+        </div>
       )}
     </AnimatePresence>
   );

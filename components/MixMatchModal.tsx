@@ -16,7 +16,7 @@ const BOX_IMAGES = {
 
 export default function MixMatchModal() {
   const { isMixMatchOpen, mixMatchProduct, closeMixMatch, addToCart } = useCart();
-  const { products: PRODUCTS } = useCatalog();
+  const { products: PRODUCTS, fetchCatalog } = useCatalog();
 
   const [boxSize, setBoxSize] = useState<3 | 6 | 9>(3);
   const [selections, setSelections] = useState<{ [productId: string]: number }>({});
@@ -27,10 +27,10 @@ export default function MixMatchModal() {
   const activeBoxSize = fixedSize || boxSize;
   const activePrice = isPartyTray ? mixMatchProduct!.price : MIX_MATCH_PRICES[activeBoxSize as 3 | 6 | 9];
 
-  // Filter available dry sweets that are in stock (excluding mix and match boxes)
+  // Filter available dry sweets (excluding mix and match boxes)
   const excludedForPartyTray = ['peda', 'kalojam-sandwich', 'kathari-bhog', 'kheer-mouchak'];
   const drySweets = PRODUCTS.filter((p) => {
-    if (p.product_type === 'custom_box' || !p.inStock) return false;
+    if (p.product_type === 'custom_box') return false;
     
     // Check if the admin explicitly configured this item
     const bundleConfig = mixMatchProduct?.bundle_items?.find(bi => bi.id === p.id);
@@ -48,6 +48,7 @@ export default function MixMatchModal() {
   // Initialize/Reset selections when product changes or box size changes
   useEffect(() => {
     if (mixMatchProduct) {
+      fetchCatalog(true);
       if (mixMatchProduct.category === 'dry-sweets') {
         // Start with 1 of the clicked sweet
         setSelections({
@@ -61,7 +62,7 @@ export default function MixMatchModal() {
       setSelections({});
       setBoxQuantity(1);
     }
-  }, [mixMatchProduct]);
+  }, [mixMatchProduct, fetchCatalog]);
 
   if (!mixMatchProduct) return null;
 
@@ -219,12 +220,13 @@ export default function MixMatchModal() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {drySweets.map((sweet) => {
                     const count = selections[sweet.id] || 0;
+                    const isOutOfStock = !sweet.inStock;
                     return (
                       <div
                         key={sweet.id}
                         className={`p-3 bg-white rounded-lg border flex items-center justify-between transition-all duration-200 ${
                           count > 0 ? 'border-primary/60 shadow-sm' : 'border-border'
-                        }`}
+                        } ${isOutOfStock ? 'opacity-50 cursor-not-allowed' : ''}`}
                       >
                         <div className="flex items-center gap-2.5 min-w-0 pr-2 flex-1">
                           {sweet.images?.[0] && (
@@ -240,13 +242,16 @@ export default function MixMatchModal() {
                           )}
                           <div className="min-w-0 flex-1">
                             <span className="font-cinzel text-xs font-semibold text-primary-deep block truncate">{sweet.name}</span>
-                            <span className="text-[10px] text-brown font-body line-clamp-1 mt-0.5">{sweet.description}</span>
+                            <span className="text-[10px] text-brown font-body line-clamp-1 mt-0.5">
+                              {isOutOfStock ? 'Out of Stock' : sweet.description}
+                            </span>
                           </div>
                         </div>
 
                         {/* Adjuster */}
                         {isPartyTray ? (
                           <button
+                            disabled={isOutOfStock}
                             onClick={() => {
                               const isSelected = !!selections[sweet.id];
                               if (isSelected) {
@@ -259,7 +264,9 @@ export default function MixMatchModal() {
                             className={`w-6 h-6 rounded flex items-center justify-center border transition-colors ${
                               selections[sweet.id]
                                 ? 'bg-primary border-primary text-white'
-                                : 'border-gray-300'
+                                : isOutOfStock
+                                ? 'bg-gray-100 border-gray-200 cursor-not-allowed text-gray-300'
+                                : 'border-gray-300 hover:border-primary'
                             }`}
                           >
                             {!!selections[sweet.id] && <Check className="w-4 h-4" />}
@@ -268,9 +275,9 @@ export default function MixMatchModal() {
                           <div className="flex items-center space-x-2 bg-cream/30 border border-border rounded">
                             <button
                               onClick={() => updateSweetQty(sweet.id, -1)}
-                              disabled={count === 0}
+                              disabled={count === 0 || isOutOfStock}
                               className={`p-1.5 transition-colors ${
-                                count === 0 ? 'text-gray-300' : 'text-primary hover:text-accent'
+                                count === 0 || isOutOfStock ? 'text-gray-300 cursor-not-allowed' : 'text-primary hover:text-accent'
                               }`}
                             >
                               <Minus className="h-3 w-3" />
@@ -280,9 +287,9 @@ export default function MixMatchModal() {
                             </span>
                             <button
                               onClick={() => updateSweetQty(sweet.id, 1)}
-                              disabled={isBoxFull}
+                              disabled={isBoxFull || isOutOfStock}
                               className={`p-1.5 transition-colors ${
-                                isBoxFull ? 'text-gray-300' : 'text-primary hover:text-accent'
+                                isBoxFull || isOutOfStock ? 'text-gray-300 cursor-not-allowed' : 'text-primary hover:text-accent'
                               }`}
                             >
                               <Plus className="h-3 w-3" />

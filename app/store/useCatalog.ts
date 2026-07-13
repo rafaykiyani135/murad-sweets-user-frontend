@@ -13,10 +13,11 @@ interface CatalogState {
 export const useCatalog = create<CatalogState>((set, get) => ({
   products: [],
   categories: [],
-  isLoading: true,
+  isLoading: false,
   error: null,
-  fetchCatalog: async () => {
-    if (get().products.length > 0 && !get().isLoading) return; // Prevent duplicate fetches
+  fetchCatalog: async (force = false) => {
+    if (get().isLoading) return; // Prevent parallel fetches
+    if (!force && get().products.length > 0) return; // Prevent duplicate fetches if not forced
     set({ isLoading: true, error: null });
     try {
       const [cats, prods] = await Promise.all([getCategories(), getProducts()]);
@@ -40,7 +41,8 @@ export const useCatalog = create<CatalogState>((set, get) => ({
           inStock: p.is_in_stock,
           minOrderQty: p.min_quantity,
           product_type: p.product_type,
-          bundle_items: enrichedBundles
+          bundle_items: enrichedBundles,
+          quantityOnHand: p.quantity_on_hand
         };
       });
       set({ categories: cats, products: mappedProds, isLoading: false });

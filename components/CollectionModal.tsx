@@ -50,7 +50,7 @@ export default function CollectionModal() {
     collectionSize,
   } = useCart();
 
-  const { products: PRODUCTS } = useCatalog();
+  const { products: PRODUCTS, fetchCatalog } = useCatalog();
 
   const [boxSize, setBoxSize] = useState<AssortedBoxSize>(collectionSize ?? 3);
   const [boxPrice, setBoxPrice] = useState<number>(ASSORTED_BOX_PRICES[collectionSize ?? 3]);
@@ -62,7 +62,6 @@ export default function CollectionModal() {
   const availableSweets = PRODUCTS.filter(
     (p) => 
       p.category === category && 
-      p.inStock && 
       p.product_type !== 'custom_box' && 
       !p.name.toLowerCase().includes('assorted') && 
       !p.name.toLowerCase().includes('mix & match')
@@ -77,8 +76,9 @@ export default function CollectionModal() {
   useEffect(() => {
     if (isCollectionModalOpen) {
       resetBuilder();
+      fetchCatalog(true);
     }
-  }, [isCollectionModalOpen, collectionCategory, resetBuilder]);
+  }, [isCollectionModalOpen, collectionCategory, resetBuilder, fetchCatalog]);
 
   const selectBoxSize = (size: AssortedBoxSize, price: number) => {
     setBoxSize(size);
@@ -369,14 +369,14 @@ function SweetRow({
   const [isAdded, setIsAdded] = useState(false);
 
   const handleAdd = () => {
-    if (isBoxFull) return;
+    if (isBoxFull || !product.inStock) return;
     onAdd(product.name, meta.color, product.images?.[0]);
     setIsAdded(true);
     setTimeout(() => setIsAdded(false), 600);
   };
 
   return (
-    <div className="flex items-center gap-3 p-2 rounded-xl hover:bg-[#FAF6F0]/60 transition-colors">
+    <div className={`flex items-center gap-3 p-2 rounded-xl transition-colors ${!product.inStock ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#FAF6F0]/60'}`}>
       {product.images?.[0] ? (
         <div className="relative w-12 h-12 rounded-full shrink-0 overflow-hidden border border-[#E8C8C8]">
           <Image
@@ -401,11 +401,13 @@ function SweetRow({
 
       <button
         type="button"
-        disabled={isBoxFull}
+        disabled={isBoxFull || !product.inStock}
         onClick={handleAdd}
         className={`shrink-0 text-xs font-bold px-3 py-1.5 rounded-full uppercase transition-all duration-300 flex items-center gap-1 ${
           isAdded
             ? 'bg-[#3fb84e] text-white scale-105 shadow-sm'
+            : !product.inStock
+            ? 'bg-gray-200 text-gray-400 cursor-not-allowed border border-gray-300'
             : isBoxFull
             ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
             : 'bg-[#1A1A1A] text-white hover:bg-primary'
@@ -415,6 +417,8 @@ function SweetRow({
           <>
             <Check className="w-3 h-3" /> Added
           </>
+        ) : !product.inStock ? (
+          'Out of Stock'
         ) : (
           '+ Add'
         )}

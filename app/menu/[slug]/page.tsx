@@ -19,7 +19,7 @@ export default function ProductDetailPage() {
   const slug = params.slug as string;
 
   useEffect(() => {
-    fetchCatalog();
+    fetchCatalog(true);
   }, [fetchCatalog]);
 
   // Find the product by slug
