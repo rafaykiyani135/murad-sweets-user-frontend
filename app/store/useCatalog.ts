@@ -7,7 +7,7 @@ interface CatalogState {
   categories: any[];
   isLoading: boolean;
   error: string | null;
-  fetchCatalog: () => Promise<void>;
+  fetchCatalog: (force?: boolean) => Promise<void>;
 }
 
 export const useCatalog = create<CatalogState>((set, get) => ({
