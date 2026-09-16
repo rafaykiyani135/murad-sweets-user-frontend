@@ -1,33 +1,109 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, MapPin, Clock, Star } from 'lucide-react';
 import CategoryShowcase from '@/components/CategoryShowcase';
 
+const heroImages = [
+  '/hero-imageloop1.webp',
+  '/hero-imageloop2.webp',
+  '/hero-imageloop3.webp',
+  '/hero-imageloop4.webp',
+];
+
+const slideVariants = {
+  enter: (direction: number) => ({
+    x: direction > 0 ? '100%' : '-100%',
+    opacity: 1,
+  }),
+  center: {
+    x: 0,
+    opacity: 1,
+  },
+  exit: (direction: number) => ({
+    x: direction < 0 ? '100%' : '-100%',
+    opacity: 1,
+  }),
+};
+
 export default function Home() {
+  const [[page, direction], setPage] = useState([0, 1]);
+
+  const currentHeroIndex = ((page % heroImages.length) + heroImages.length) % heroImages.length;
+
+  const paginate = (newDirection: number) => {
+    setPage(([prevPage]) => [prevPage + newDirection, newDirection]);
+  };
+
+  const goToSlide = (targetIndex: number) => {
+    const diff = targetIndex - currentHeroIndex;
+    if (diff !== 0) {
+      setPage(([prevPage]) => [prevPage + diff, diff > 0 ? 1 : -1]);
+    }
+  };
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      paginate(1);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
+
   return (
     <div className="flex flex-col w-full overflow-x-hidden bg-cream">
       {/* 1. HERO SECTION */}
       <section className="relative min-h-[90vh] md:min-h-[85vh] flex items-center justify-start pt-28 pb-12 md:py-20 overflow-hidden">
-        {/* Background Image */}
-        <div className="absolute inset-0 z-0 overflow-hidden">
-          <Image
-            src="/HeroSectionImageVersion2.webp"
+        {/* Horizontal Background Image Carousel Loop */}
+        <div className="absolute inset-0 z-0 overflow-hidden bg-cream">
+          <AnimatePresence initial={false} custom={direction}>
+            <motion.div
+              key={page}
+              custom={direction}
+              variants={slideVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{
+                x: { type: 'spring', stiffness: 260, damping: 30 },
+                opacity: { duration: 0.3 },
+              }}
+              className="absolute inset-0 w-full h-full"
+            >
+              <Image
+                src={heroImages[currentHeroIndex]}
+                alt={`Murad Sweets Hero ${currentHeroIndex + 1}`}
+                fill
+                priority
+                className="object-cover object-center sm:object-right w-full h-full"
+              />
+            </motion.div>
+          </AnimatePresence>
 
-            alt="Murad Sweets Background"
-            fill
-            priority
-            className="hidden sm:block object-cover object-right scale-[1.2] translate-x-[8%]"
-          />
-          <Image
-            src="/HeroSectionPhoneViewVersion3.webp"
-            alt="Murad Sweets Background Mobile"
-            fill
-            priority
-            className="block sm:hidden object-cover object-center"
-          />
+          {/* Hidden Image Preloader to download all 4 images instantly on page load */}
+          <div className="hidden">
+            {heroImages.map((src) => (
+              <Image key={src} src={src} alt="preload" width={1} height={1} priority />
+            ))}
+          </div>
+        </div>
+
+        {/* Slide Indicators */}
+        <div className="absolute bottom-6 right-6 sm:right-12 z-20 flex items-center space-x-2 bg-cream/50 backdrop-blur-md px-3 py-1.5 rounded-full border border-primary-deep/10 shadow-sm">
+          {heroImages.map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => goToSlide(idx)}
+              className={`h-2 transition-all duration-500 rounded-full ${
+                currentHeroIndex === idx
+                  ? 'w-6 bg-primary-deep'
+                  : 'w-2 bg-primary-deep/40 hover:bg-primary-deep/70'
+              }`}
+              aria-label={`Go to hero image slide ${idx + 1}`}
+            />
+          ))}
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10">

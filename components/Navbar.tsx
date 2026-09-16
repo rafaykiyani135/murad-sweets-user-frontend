@@ -10,6 +10,7 @@ import { useFulfillmentStore } from '@/app/store/fulfillmentStore';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Navbar() {
+  const [mounted, setMounted] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
@@ -20,6 +21,7 @@ export default function Navbar() {
   const { orderType, address, openModal, hasValidFulfillment } = useFulfillmentStore();
 
   useEffect(() => {
+    setMounted(true);
     const handleScroll = () => {
       if (window.scrollY > 20) {
         setIsScrolled(true);
@@ -94,7 +96,7 @@ export default function Navbar() {
             <div className="flex items-center space-x-2 sm:space-x-3">
 
               {/* Fulfillment Chip — desktop only */}
-              {hasValidFulfillment() && (
+              {mounted && hasValidFulfillment() && (
                 <button
                   id="fulfillment-chip-btn"
                   onClick={openModal}
@@ -122,7 +124,7 @@ export default function Navbar() {
               >
                 <ShoppingBag className="h-6 w-6 stroke-[1.5]" />
                 <AnimatePresence>
-                  {cartCount > 0 && (
+                  {mounted && cartCount > 0 && (
                     <motion.span
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
