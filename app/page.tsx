@@ -7,11 +7,19 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, MapPin, Clock, Star } from 'lucide-react';
 import CategoryShowcase from '@/components/CategoryShowcase';
 
-const heroImages = [
-  '/hero-imageloop1.webp',
-  '/hero-imageloop2.webp',
-  '/hero-imageloop3.webp',
-  '/hero-imageloop4.webp',
+const heroSlides = [
+  {
+    desktop: '/hero-imageloop2.webp',
+    mobile: '/hero-imageloop2(mobile).webp',
+  },
+  {
+    desktop: '/hero-imageloop3.webp',
+    mobile: '/hero-imageloop3(mobile).webp',
+  },
+  {
+    desktop: '/hero-imageloop4.webp',
+    mobile: '/hero-imageloop4(mobile).webp',
+  },
 ];
 
 const slideVariants = {
@@ -32,7 +40,7 @@ const slideVariants = {
 export default function Home() {
   const [[page, direction], setPage] = useState([0, 1]);
 
-  const currentHeroIndex = ((page % heroImages.length) + heroImages.length) % heroImages.length;
+  const currentHeroIndex = ((page % heroSlides.length) + heroSlides.length) % heroSlides.length;
 
   const paginate = (newDirection: number) => {
     setPage(([prevPage]) => [prevPage + newDirection, newDirection]);
@@ -72,27 +80,42 @@ export default function Home() {
               }}
               className="absolute inset-0 w-full h-full"
             >
+              {/* Desktop Image */}
               <Image
-                src={heroImages[currentHeroIndex]}
+                src={heroSlides[currentHeroIndex].desktop}
                 alt={`Murad Sweets Hero ${currentHeroIndex + 1}`}
                 fill
                 priority
-                className="object-cover object-center sm:object-right w-full h-full"
+                className="hidden sm:block object-cover object-right w-full h-full"
+              />
+              {/* Mobile Image */}
+              <Image
+                src={heroSlides[currentHeroIndex].mobile}
+                alt={`Murad Sweets Hero Mobile ${currentHeroIndex + 1}`}
+                fill
+                priority
+                className="block sm:hidden object-cover object-center w-full h-full"
               />
             </motion.div>
           </AnimatePresence>
 
-          {/* Hidden Image Preloader to download all 4 images instantly on page load */}
+          {/* Hidden Image Preloader to download all images instantly on page load */}
           <div className="hidden">
-            {heroImages.map((src) => (
-              <Image key={src} src={src} alt="preload" width={1} height={1} priority />
+            {heroSlides.map((slide, idx) => (
+              <div key={idx}>
+                <Image src={slide.desktop} alt="preload desktop" width={1} height={1} priority />
+                <Image src={slide.mobile} alt="preload mobile" width={1} height={1} priority />
+              </div>
             ))}
           </div>
+
+          {/* Gradient Overlay for Text Legibility */}
+          <div className="absolute inset-0 bg-gradient-to-r from-cream/95 via-cream/75 to-cream/10 sm:from-cream/90 sm:via-cream/55 sm:to-transparent z-[1] pointer-events-none" />
         </div>
 
         {/* Slide Indicators */}
         <div className="absolute bottom-6 right-6 sm:right-12 z-20 flex items-center space-x-2 bg-cream/50 backdrop-blur-md px-3 py-1.5 rounded-full border border-primary-deep/10 shadow-sm">
-          {heroImages.map((_, idx) => (
+          {heroSlides.map((_, idx) => (
             <button
               key={idx}
               onClick={() => goToSlide(idx)}
