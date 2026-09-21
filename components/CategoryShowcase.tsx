@@ -187,10 +187,7 @@ export default function CategoryShowcase() {
               {/* Text content */}
               <div className="w-1/2 flex flex-col justify-center py-4 px-3 sm:py-16 sm:px-6 lg:px-16 xl:px-24 relative">
                 <div className="max-w-xl w-full mx-auto">
-                  <div className="flex flex-col xl:flex-row xl:items-center gap-1.5 sm:gap-6 mb-2 sm:mb-8">
-                    <div className="w-8 h-8 sm:w-16 sm:h-16 md:w-20 md:h-20 shrink-0 rounded-full bg-[#FCE5D8] flex items-center justify-center text-[#681628] shadow-sm">
-                      <CategoryIcon id={item.id} className="w-4 h-4 sm:w-8 sm:h-8 md:w-10 md:h-10" />
-                    </div>
+                  <div className="mb-2 sm:mb-8">
                     <h3 className="text-base sm:text-3xl md:text-5xl lg:text-6xl font-serif font-bold text-[#541523] leading-tight">
                       {item.title}
                     </h3>
