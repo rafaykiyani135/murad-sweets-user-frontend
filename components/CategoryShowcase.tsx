@@ -159,21 +159,21 @@ export default function CategoryShowcase() {
           return (
             <div key={item.id} className={`flex ${imageLeft ? 'flex-row-reverse' : 'flex-row'} w-full bg-[#FFF4EE]`}>
               {/* Text content */}
-              <div className="w-1/2 flex flex-col justify-center py-4 px-3 sm:py-16 sm:px-6 lg:px-16 xl:px-24 relative">
+              <div className="w-1/2 flex flex-col justify-center py-6 px-4 sm:py-12 sm:px-8 lg:px-14 xl:px-20 relative">
                 <div className="max-w-xl w-full mx-auto">
-                  <div className="mb-2 sm:mb-8">
-                    <h3 className="text-base sm:text-3xl md:text-5xl lg:text-6xl font-serif font-bold text-[#541523] leading-tight">
+                  <div className="mb-2 sm:mb-6">
+                    <h3 className="text-lg sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-serif font-bold text-[#541523] leading-tight">
                       {item.title}
                     </h3>
                   </div>
 
-                  <p className="text-[#541523]/80 text-[10px] sm:text-base md:text-xl leading-tight sm:leading-relaxed mb-6 sm:mb-10 font-medium">
+                  <p className="text-[#541523]/85 text-xs sm:text-base md:text-lg lg:text-xl leading-relaxed mb-5 sm:mb-8 font-medium">
                     {item.description}
                   </p>
 
                   <Link
                     href="/menu"
-                    className="inline-flex items-center justify-center gap-1 sm:gap-3 bg-[#681628] text-white px-3 py-1.5 sm:px-8 sm:py-3.5 rounded hover:bg-[#541523] transition-colors font-semibold tracking-wide text-[9px] sm:text-sm md:text-base w-fit shadow-md hover:shadow-lg"
+                    className="inline-flex items-center justify-center gap-1.5 sm:gap-3 bg-[#681628] text-white px-4 py-2 sm:px-7 sm:py-3.5 rounded hover:bg-[#541523] transition-colors font-semibold tracking-wide text-xs sm:text-sm md:text-base w-fit shadow-md hover:shadow-lg"
                   >
                     Order Now
                     <span>→</span>
@@ -182,7 +182,7 @@ export default function CategoryShowcase() {
               </div>
 
               {/* Image */}
-              <div className="w-1/2 relative min-h-[160px] sm:min-h-[400px] md:min-h-[500px] lg:min-h-[600px] xl:min-h-[700px]">
+              <div className="w-1/2 relative min-h-[200px] sm:min-h-[380px] md:min-h-[460px] lg:min-h-[520px] xl:min-h-[580px]">
                 <Image
                   src={item.image}
                   alt={item.title}
