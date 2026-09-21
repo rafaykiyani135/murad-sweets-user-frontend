@@ -138,16 +138,12 @@ export default function Home() {
               className="space-y-6"
             >
               <div className="flex flex-col space-y-1">
-                <div className="flex items-center space-x-2 text-primary-deep">
-                  <svg className="h-5 w-5 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
-                    <circle cx="12" cy="12" r="3" />
-                  </svg>
+                <div className="flex items-center text-primary-deep">
                   <span className="font-subheading text-sm font-bold tracking-widest uppercase">
                     Murad Sweets
                   </span>
                 </div>
-                <span className="font-subheading text-[10px] tracking-widest text-primary-deep uppercase ml-7">
+                <span className="font-subheading text-[10px] tracking-widest text-primary-deep uppercase">
                   Houston, Texas
                 </span>
               </div>
