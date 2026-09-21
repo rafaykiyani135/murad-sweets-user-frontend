@@ -272,7 +272,7 @@ export default function FulfillmentModal() {
                       <div>
                         <p className="font-cinzel text-sm font-bold text-white uppercase tracking-wider">Pickup</p>
                         <p className="text-xs text-white/50 font-body mt-1 leading-relaxed">
-                          Pick up from our Sugar Land, TX kitchen. Free of charge.
+                          Pick Up Location: Sugar Land Texas 77498.
                         </p>
                       </div>
                       <span className="px-3 py-1 rounded-full text-[10px] font-cinzel font-bold uppercase tracking-wider bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
@@ -302,15 +302,6 @@ export default function FulfillmentModal() {
                         Up to 50 mi
                       </span>
                     </button>
-                  </div>
-
-                  {/* Store info */}
-                  <div className="flex items-center gap-2 p-3 rounded-lg bg-white/5 border border-white/8">
-                    <Navigation className="h-4 w-4 text-[#c9a84c]/70 shrink-0" />
-                    <p className="text-xs text-white/45 font-body">
-                      <span className="text-white/70 font-semibold">Store:</span>{' '}
-                      11920 S Texas 6, Unit 1280, Sugar Land, TX 77498
-                    </p>
                   </div>
                 </div>
               )}
@@ -569,7 +560,8 @@ export default function FulfillmentModal() {
             </div>
           </motion.div>
         </>
-      )}
-    </AnimatePresence>
+      )
+      }
+    </AnimatePresence >
   );
 }

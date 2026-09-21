@@ -216,7 +216,7 @@ function CheckoutForm() {
             <p className="text-xs text-brown font-body mt-0.5">
               {orderType === 'delivery' && address
                 ? address
-                : '11920 S Texas 6, Unit 1280, Sugar Land, TX 77498'}
+                : 'Houston, Texas'}
             </p>
             {orderType === 'delivery' && drivingDistanceMiles !== null && (
               <p className="text-[10px] text-brown/70 font-body">
@@ -322,7 +322,7 @@ function CheckoutForm() {
                       Pickup Address
                     </h3>
                     <p className="text-xs text-primary-deep leading-relaxed font-body">
-                      <strong>Murad Sweets:</strong> 11920 S Texas 6, Unit 1280, Sugar Land, TX 77498<br />
+                      <strong>Murad Sweets:</strong> Houston, Texas<br />
                     </p>
                   </div>
                 )}
