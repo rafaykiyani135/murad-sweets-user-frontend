@@ -148,32 +148,6 @@ function CategoryIcon({ id, className }: { id: string; className?: string }) {
   );
 }
 
-function CheckIcon(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" {...props}>
-      <circle cx="12" cy="12" r="10" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4" />
-    </svg>
-  );
-}
-
-function FeatureList({ type, iconImage }: { type: string; features: string[]; iconImage?: string }) {
-  if (type === 'image-row' && iconImage) {
-    return (
-      <div className="w-full relative h-[40px] sm:h-[140px] md:h-[180px] lg:h-[220px]">
-        <Image
-          src={iconImage}
-          alt="Category Icons"
-          fill
-          className="object-contain mix-blend-multiply object-left"
-        />
-      </div>
-    );
-  }
-
-  return null;
-}
-
 export default function CategoryShowcase() {
   const showcaseItems = items;
 
@@ -193,13 +167,9 @@ export default function CategoryShowcase() {
                     </h3>
                   </div>
 
-                  <p className="text-[#541523]/80 text-[10px] sm:text-base md:text-xl leading-tight sm:leading-relaxed mb-3 sm:mb-10 font-medium">
+                  <p className="text-[#541523]/80 text-[10px] sm:text-base md:text-xl leading-tight sm:leading-relaxed mb-6 sm:mb-10 font-medium">
                     {item.description}
                   </p>
-
-                  <div className="mb-4 sm:mb-12">
-                    <FeatureList type={item.type} features={item.features} iconImage={item.iconImage} />
-                  </div>
 
                   <Link
                     href="/menu"
