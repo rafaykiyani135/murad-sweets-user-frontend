@@ -1,10 +1,10 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: "Menu | Authentic Bangladeshi Mishti & Bengali Mithai | Murad Sweets",
-  description: "Browse our complete catalog of authentic Bangladeshi sweets, Bengali Mithai, and Mishti Doi. Order custom mix-and-match dry sweet boxes, Chom Chom, Kalo Jam, Sandesh, and more.",
+  title: "Menu | Authentic Bangladeshi Mishti & Bengali Desserts | Murad Sweets",
+  description: "Browse our complete catalog of authentic Bangladeshi sweets, Bengali Desserts, and Mishti Doi. Order custom mix-and-match dry sweet boxes, Chom Chom, Kalo Jam, Sandesh, and more.",
   keywords: [
-    "Bengali Mithai Menu",
+    "Bengali Desserts Menu",
     "Bangladeshi Mishti Catalog",
     "Order Mishti Doi",
     "Buy Rasmalai Online",

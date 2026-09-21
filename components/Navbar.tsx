@@ -61,7 +61,7 @@ export default function Navbar() {
                     Murad Sweets
                   </span>
                   <span className="mt-1 text-[8px] uppercase tracking-[0.25em] text-accent font-subheading">
-                    Artisanal Mithai
+                    Artisanal Desserts
                   </span>
                 </span>
               </Link>
@@ -190,7 +190,7 @@ export default function Navbar() {
                         Murad Sweets
                       </span>
                       <span className="mt-1 text-[8px] uppercase tracking-[0.2em] text-accent font-subheading">
-                        Artisanal Mithai
+                        Artisanal Desserts
                       </span>
                     </span>
                   </div>

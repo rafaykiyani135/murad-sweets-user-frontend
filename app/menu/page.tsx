@@ -70,7 +70,7 @@ function ProductQuickModal({
           {product.images[0] ? (
             <Image src={product.images[0]} alt={product.name} fill sizes="(max-width: 640px) 100vw, 448px" className="object-cover" />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-primary/40 font-subheading text-sm">Mithai</div>
+            <div className="w-full h-full flex items-center justify-center text-primary/40 font-subheading text-sm">Dessert</div>
           )}
           {!product.inStock && (
             <div className="absolute inset-0 bg-white/70 flex items-center justify-center">
@@ -385,7 +385,7 @@ function CatalogContent() {
         {/* Sticky header + pill nav */}
         <div className="sticky top-0 z-30 bg-cream/95 backdrop-blur-md border-b border-border shadow-sm px-4 pt-4 pb-3 space-y-3">
           <div>
-            <h1 className="font-heading text-2xl text-primary font-extrabold tracking-tight">Our Mithai</h1>
+            <h1 className="font-heading text-2xl text-primary font-extrabold tracking-tight">Our Desserts</h1>
             <p className="text-[11px] text-brown font-body">Authentic sweets, handcrafted fresh to order.</p>
           </div>
 
@@ -467,7 +467,7 @@ function CatalogContent() {
         <div className="flex flex-col space-y-6">
           {/* Page Title */}
           <div className="flex flex-col space-y-2 border-b border-border pb-6">
-            <h1 className="font-heading text-4xl text-primary font-extrabold tracking-tight">Our Mithai Catalog</h1>
+            <h1 className="font-heading text-4xl text-primary font-extrabold tracking-tight">Our Desserts Catalog</h1>
             <p className="text-sm text-brown font-body">
               Explore our collection of authentic sweets, custom boxes, and savory treats, handcrafted fresh to order.
             </p>

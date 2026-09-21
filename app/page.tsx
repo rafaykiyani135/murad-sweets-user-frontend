@@ -154,7 +154,7 @@ export default function Home() {
 
               <h1 className="font-heading text-4xl sm:text-5xl md:text-[3.5rem] font-extrabold tracking-tight text-primary-deep leading-[1.1]">
                 Authentic Bangladeshi<br />
-                Mithai, Made with<br />
+                Desserts, Made with<br />
                 Tradition &amp; Love
               </h1>
             </motion.div>
@@ -199,7 +199,7 @@ export default function Home() {
             <div className="w-16 h-[2px] bg-accent mt-4" />
           </div>
           <p className="text-sm sm:text-base text-primary-deep font-body leading-loose max-w-2xl mx-auto pt-2">
-             Murad Sweets was born from a desire to share the rich culinary heritage of Bangladesh. Operating in Houston, we specialize in artisanal sweets (mithai) prepared using legacy family recipes...
+             Murad Sweets was born from a desire to share the rich culinary heritage of Bangladesh. Operating in Houston, we specialize in artisanal sweets (desserts) prepared using legacy family recipes...
           </p>
           <p className="text-xs text-brown font-cinzel font-semibold tracking-wider italic uppercase">
             &mdash; Preserving Traditions, One Sweet at a Time &mdash;

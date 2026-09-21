@@ -22,10 +22,10 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Murad Sweets | Authentic Bangladeshi Mishti & Bengali Mithai in USA",
+  title: "Murad Sweets | Authentic Bangladeshi Mishti & Bengali Desserts in USA",
   description: "Experience the premium taste of authentic, home-cooked Bangladeshi sweets in Houston, Texas. Order custom mix-and-match dry sweet boxes, authentic Mishti Doi, Rasmalai, Chom Chom, Kalo Jam, Sandesh, party trays, and traditional winter pitha.",
   keywords: [
-    "Bengali Mithai",
+    "Bengali Desserts",
     "Bangladeshi Mishti",
     "Mishti Doi",
     "Rasmalai Cake",
@@ -39,11 +39,11 @@ export const metadata: Metadata = {
     "Gulab Jamun",
     "Sandesh",
     "Rasgulla",
-    "Bangladeshi Mithai Online",
+    "Bangladeshi Desserts Online",
     "Bengali Desserts"
   ],
   openGraph: {
-    title: "Murad Sweets | Authentic Bangladeshi Mishti & Bengali Mithai",
+    title: "Murad Sweets | Authentic Bangladeshi Mishti & Bengali Desserts",
     description: "Premium, authentic home-cooked Bangladeshi sweets in Houston. Specializing in mix-and-match boxes, Mishti Doi, Rasmalai, and traditional pitha.",
     url: "https://muradsweets.com",
     siteName: "Murad Sweets",
@@ -52,7 +52,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Murad Sweets | Premium Bangladeshi Mishti & Bengali Mithai",
+    title: "Murad Sweets | Premium Bangladeshi Mishti & Bengali Desserts",
     description: "Authentic, handcrafted Bangladeshi sweets. Order custom mix-and-match boxes, Mishti Doi, and more today.",
   },
   robots: {

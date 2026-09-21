@@ -141,7 +141,7 @@ export default function ProductDetailPage() {
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-primary/40 font-subheading">
-                Mithai Image
+                Dessert Image
               </div>
             )}
             

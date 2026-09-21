@@ -17,13 +17,13 @@ export async function generateMetadata(
     
     if (product) {
       return {
-        title: `${product.name} | Authentic Bengali Mithai | Murad Sweets`,
+        title: `${product.name} | Authentic Bengali Desserts | Murad Sweets`,
         description: product.description || `Order authentic ${product.name}, a premium Bangladeshi Mishti. Handcrafted with traditional recipes and premium ingredients.`,
         keywords: [
           product.name,
-          "Bengali Mithai",
+          "Bengali Desserts",
           "Bangladeshi Mishti",
-          "Buy Mithai Online",
+          "Buy Desserts Online",
           "Halal Sweets USA"
         ]
       };
@@ -34,8 +34,8 @@ export async function generateMetadata(
 
   // Fallback metadata if API fails
   return {
-    title: "Premium Bangladeshi Mishti | Bengali Mithai | Murad Sweets",
-    description: "Discover our authentic, hand-crafted Bangladeshi sweets and Bengali Mithai. Enjoy the taste of tradition.",
+    title: "Premium Bangladeshi Mishti | Bengali Desserts | Murad Sweets",
+    description: "Discover our authentic, hand-crafted Bangladeshi sweets and Bengali Desserts. Enjoy the taste of tradition.",
   };
 }
 

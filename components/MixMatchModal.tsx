@@ -148,7 +148,7 @@ export default function MixMatchModal() {
             {/* Header */}
             <div className="p-4 sm:p-6 border-b border-border bg-primary-deep text-cream flex items-center justify-between flex-shrink-0">
               <div>
-                <h3 className="font-heading text-lg sm:text-xl text-accent">Customize Your Mithai Box</h3>
+                <h3 className="font-heading text-lg sm:text-xl text-accent">Customize Your Dessert Box</h3>
                 <p className="text-xs text-cream/70 mt-1 font-body">Select a box size and pick your favorite traditional sweets.</p>
               </div>
               <button

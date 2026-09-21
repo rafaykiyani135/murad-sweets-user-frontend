@@ -38,7 +38,7 @@ export default function Footer() {
                   Murad Sweets
                 </span>
                 <span className="mt-1 text-[10px] uppercase tracking-[0.25em] text-cream font-subheading">
-                  Artisanal Mithai
+                  Artisanal Desserts
                 </span>
               </span>
             </Link>
