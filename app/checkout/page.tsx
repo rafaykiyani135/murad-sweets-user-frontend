@@ -15,8 +15,29 @@ import { getCartQuote, createOrder } from '@/app/lib/api';
 import Image from 'next/image';
 
 // ─── Validation Schema (simplified — address is now pre-set by fulfillment store) ─
+function localDateString(d: Date) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+/** Tomorrow through today + 90 days. Today and every earlier date are excluded. */
+function preferredDateBounds() {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const min = new Date(today);
+  min.setDate(min.getDate() + 1);
+  const max = new Date(today);
+  max.setDate(max.getDate() + 90);
+  return { min: localDateString(min), max: localDateString(max) };
+}
+
 const checkoutSchema = z.object({
-  date: z.string().min(1, 'Date is required'),
+  date: z.string().min(1, 'Date is required').refine((value) => {
+    const { min, max } = preferredDateBounds();
+    return value >= min && value <= max;
+  }, 'Choose a date from tomorrow through the next 90 days.'),
   slot: z.string().min(1, 'Time slot is required'),
   fullName: z.string().min(2, 'Name must be at least 2 characters'),
   email: z.string().email('Please enter a valid email address'),
@@ -99,11 +120,7 @@ function CheckoutForm() {
     fetchQuote();
   }, [cartItems, orderType, address]);
 
-  const getMinDate = () => {
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    return tomorrow.toISOString().split('T')[0];
-  };
+  const { min: minDate, max: maxDate } = preferredDateBounds();
 
   const handleNextStep = async () => {
     let fields: any[] = [];
@@ -294,7 +311,8 @@ function CheckoutForm() {
                     <label className="block text-[10px] uppercase font-cinzel font-semibold text-brown mb-1.5">Preferred Date</label>
                     <input
                       type="date"
-                      min={getMinDate()}
+                      min={minDate}
+                      max={maxDate}
                       {...register('date')}
                       className="w-full text-xs bg-cream/20 border border-border rounded-md p-2.5 text-primary-deep focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer"
                     />
