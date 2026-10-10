@@ -2,12 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { Eye, EyeOff } from 'lucide-react';
 import { api } from '@/app/lib/api';
 
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [checkingSession, setCheckingSession] = useState(true);
@@ -17,6 +19,8 @@ export default function LoginPage() {
   const [forgotEmail, setForgotEmail] = useState('');
   const [forgotLoading, setForgotLoading] = useState(false);
   const [forgotMessage, setForgotMessage] = useState('');
+  const [forgotError, setForgotError] = useState('');
+  const [devResetLink, setDevResetLink] = useState('');
 
   // If already authenticated, redirect to /history
   useEffect(() => {
@@ -44,11 +48,23 @@ export default function LoginPage() {
     e.preventDefault();
     setForgotLoading(true);
     setForgotMessage('');
+    setForgotError('');
+    setDevResetLink('');
     try {
       const res = await api.post('/auth/forgot-password', { email: forgotEmail });
       setForgotMessage(res.data.message || 'If that email is registered, a reset link has been sent.');
-    } catch {
-      setForgotMessage('If that email is registered, a reset link has been sent.');
+      if (typeof res.data.dev_reset_link === 'string' && res.data.dev_reset_link) {
+        setDevResetLink(res.data.dev_reset_link);
+      }
+    } catch (err: any) {
+      const status = err?.response?.status;
+      if (status === 422) {
+        setForgotError('Please enter a valid email address.');
+      } else if (!err?.response) {
+        setForgotError('Could not reach the server. Please try again.');
+      } else {
+        setForgotError('Could not send a reset email. Please try again later.');
+      }
     } finally {
       setForgotLoading(false);
     }
@@ -170,24 +186,38 @@ export default function LoginPage() {
               }}>
                 Password
               </label>
-              <input
-                id="login-password"
-                type="password"
-                required
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                placeholder="••••••••"
-                autoComplete="current-password"
-                style={{
-                  width: '100%', padding: '14px 16px', borderRadius: '10px',
-                  border: '1px solid #E8C8C8', background: '#FAFAFA',
-                  color: '#4A0F17', fontSize: '15px', outline: 'none',
-                  transition: 'border-color 0.2s, box-shadow 0.2s',
-                  boxSizing: 'border-box',
-                }}
-                onFocus={e => { e.currentTarget.style.borderColor = '#7B1E2B'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(123,30,43,0.08)'; }}
-                onBlur={e => { e.currentTarget.style.borderColor = '#E8C8C8'; e.currentTarget.style.boxShadow = 'none'; }}
-              />
+              <div style={{ position: 'relative' }}>
+                <input
+                  id="login-password"
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  autoComplete="current-password"
+                  style={{
+                    width: '100%', padding: '14px 44px 14px 16px', borderRadius: '10px',
+                    border: '1px solid #E8C8C8', background: '#FAFAFA',
+                    color: '#4A0F17', fontSize: '15px', outline: 'none',
+                    transition: 'border-color 0.2s, box-shadow 0.2s',
+                    boxSizing: 'border-box',
+                  }}
+                  onFocus={e => { e.currentTarget.style.borderColor = '#7B1E2B'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(123,30,43,0.08)'; }}
+                  onBlur={e => { e.currentTarget.style.borderColor = '#E8C8C8'; e.currentTarget.style.boxShadow = 'none'; }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(v => !v)}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  style={{
+                    position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)',
+                    background: 'none', border: 'none', padding: 4, cursor: 'pointer',
+                    color: '#8A5A2B', display: 'flex', alignItems: 'center',
+                  }}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
             </div>
 
             {error && (
@@ -233,7 +263,7 @@ export default function LoginPage() {
             <div style={{ textAlign: 'center', marginTop: '20px' }}>
               <button
                 type="button"
-                onClick={() => { setShowForgot(true); setError(''); setForgotMessage(''); }}
+                onClick={() => { setShowForgot(true); setError(''); setForgotMessage(''); setForgotError(''); setDevResetLink(''); }}
                 style={{
                   background: 'none', border: 'none', color: '#7B1E2B', fontSize: '13px',
                   fontWeight: 600, cursor: 'pointer', textDecoration: 'underline',
@@ -278,6 +308,16 @@ export default function LoginPage() {
               />
             </div>
 
+            {forgotError && (
+              <div style={{
+                padding: '12px 16px', borderRadius: '10px', marginBottom: '20px',
+                background: '#FFF4F4', border: '1px solid #FECACA', color: '#991B1B',
+                fontSize: '13px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px',
+              }}>
+                <span>⚠️</span> {forgotError}
+              </div>
+            )}
+
             {forgotMessage && (
               <div style={{
                 padding: '12px 16px', borderRadius: '10px', marginBottom: '20px',
@@ -285,6 +325,16 @@ export default function LoginPage() {
                 fontSize: '13px', fontWeight: 600,
               }}>
                 ✅ {forgotMessage}
+                {devResetLink && (
+                  <div style={{ marginTop: '10px' }}>
+                    <a
+                      href={devResetLink}
+                      style={{ color: '#7B1E2B', textDecoration: 'underline', fontWeight: 700 }}
+                    >
+                      Open reset link (development)
+                    </a>
+                  </div>
+                )}
               </div>
             )}
 
@@ -309,7 +359,7 @@ export default function LoginPage() {
             <div style={{ textAlign: 'center', marginTop: '20px' }}>
               <button
                 type="button"
-                onClick={() => { setShowForgot(false); setForgotMessage(''); }}
+                onClick={() => { setShowForgot(false); setForgotMessage(''); setForgotError(''); setDevResetLink(''); }}
                 style={{
                   background: 'none', border: 'none', color: '#7B1E2B', fontSize: '13px',
                   fontWeight: 600, cursor: 'pointer', textDecoration: 'underline',

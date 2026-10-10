@@ -2,6 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { Eye, EyeOff } from 'lucide-react';
 import { api } from '@/app/lib/api';
 
 function ResetPasswordForm() {
@@ -11,6 +12,8 @@ function ResetPasswordForm() {
 
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
@@ -129,25 +132,39 @@ function ResetPasswordForm() {
               }}>
                 New Password
               </label>
-              <input
-                id="new-password"
-                type="password"
-                required
-                minLength={8}
-                value={newPassword}
-                onChange={e => setNewPassword(e.target.value)}
-                placeholder="Minimum 8 characters"
-                autoComplete="new-password"
-                style={{
-                  width: '100%', padding: '14px 16px', borderRadius: '10px',
-                  border: '1px solid #E8C8C8', background: '#FAFAFA',
-                  color: '#4A0F17', fontSize: '15px', outline: 'none',
-                  transition: 'border-color 0.2s, box-shadow 0.2s',
-                  boxSizing: 'border-box',
-                }}
-                onFocus={e => { e.currentTarget.style.borderColor = '#7B1E2B'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(123,30,43,0.08)'; }}
-                onBlur={e => { e.currentTarget.style.borderColor = '#E8C8C8'; e.currentTarget.style.boxShadow = 'none'; }}
-              />
+              <div style={{ position: 'relative' }}>
+                <input
+                  id="new-password"
+                  type={showNewPassword ? 'text' : 'password'}
+                  required
+                  minLength={8}
+                  value={newPassword}
+                  onChange={e => setNewPassword(e.target.value)}
+                  placeholder="Minimum 8 characters"
+                  autoComplete="new-password"
+                  style={{
+                    width: '100%', padding: '14px 44px 14px 16px', borderRadius: '10px',
+                    border: '1px solid #E8C8C8', background: '#FAFAFA',
+                    color: '#4A0F17', fontSize: '15px', outline: 'none',
+                    transition: 'border-color 0.2s, box-shadow 0.2s',
+                    boxSizing: 'border-box',
+                  }}
+                  onFocus={e => { e.currentTarget.style.borderColor = '#7B1E2B'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(123,30,43,0.08)'; }}
+                  onBlur={e => { e.currentTarget.style.borderColor = '#E8C8C8'; e.currentTarget.style.boxShadow = 'none'; }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowNewPassword(v => !v)}
+                  aria-label={showNewPassword ? 'Hide password' : 'Show password'}
+                  style={{
+                    position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)',
+                    background: 'none', border: 'none', padding: 4, cursor: 'pointer',
+                    color: '#8A5A2B', display: 'flex', alignItems: 'center',
+                  }}
+                >
+                  {showNewPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
             </div>
 
             <div style={{ marginBottom: '28px' }}>
@@ -157,25 +174,39 @@ function ResetPasswordForm() {
               }}>
                 Confirm Password
               </label>
-              <input
-                id="confirm-password"
-                type="password"
-                required
-                minLength={8}
-                value={confirmPassword}
-                onChange={e => setConfirmPassword(e.target.value)}
-                placeholder="Re-enter your password"
-                autoComplete="new-password"
-                style={{
-                  width: '100%', padding: '14px 16px', borderRadius: '10px',
-                  border: '1px solid #E8C8C8', background: '#FAFAFA',
-                  color: '#4A0F17', fontSize: '15px', outline: 'none',
-                  transition: 'border-color 0.2s, box-shadow 0.2s',
-                  boxSizing: 'border-box',
-                }}
-                onFocus={e => { e.currentTarget.style.borderColor = '#7B1E2B'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(123,30,43,0.08)'; }}
-                onBlur={e => { e.currentTarget.style.borderColor = '#E8C8C8'; e.currentTarget.style.boxShadow = 'none'; }}
-              />
+              <div style={{ position: 'relative' }}>
+                <input
+                  id="confirm-password"
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  required
+                  minLength={8}
+                  value={confirmPassword}
+                  onChange={e => setConfirmPassword(e.target.value)}
+                  placeholder="Re-enter your password"
+                  autoComplete="new-password"
+                  style={{
+                    width: '100%', padding: '14px 44px 14px 16px', borderRadius: '10px',
+                    border: '1px solid #E8C8C8', background: '#FAFAFA',
+                    color: '#4A0F17', fontSize: '15px', outline: 'none',
+                    transition: 'border-color 0.2s, box-shadow 0.2s',
+                    boxSizing: 'border-box',
+                  }}
+                  onFocus={e => { e.currentTarget.style.borderColor = '#7B1E2B'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(123,30,43,0.08)'; }}
+                  onBlur={e => { e.currentTarget.style.borderColor = '#E8C8C8'; e.currentTarget.style.boxShadow = 'none'; }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(v => !v)}
+                  aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                  style={{
+                    position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)',
+                    background: 'none', border: 'none', padding: 4, cursor: 'pointer',
+                    color: '#8A5A2B', display: 'flex', alignItems: 'center',
+                  }}
+                >
+                  {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
             </div>
 
             {error && (
