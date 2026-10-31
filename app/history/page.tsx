@@ -96,6 +96,11 @@ interface AdminProduct {
   is_in_stock: boolean;
   quantity_on_hand: number | null;
   sort_order: number;
+  metadata?: {
+    images?: string[];
+    bundle_items?: { id: string; quantity: number }[];
+    [key: string]: unknown;
+  } | null;
 }
 
 interface AdminCategory {
@@ -988,8 +993,6 @@ function AddProductRow({ categoryId, onSave, onCancel }: { categoryId: string; o
     }
   };
 
-  const fileName = name.replace(/\s+/g, '');
-
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', padding: '14px', borderRadius: '10px', background: '#F0FAF4', border: '1px dashed #10B981' }}>
       {/* Row 1: core fields */}
@@ -1014,7 +1017,7 @@ function AddProductRow({ categoryId, onSave, onCancel }: { categoryId: string; o
             <img src={imagePreview} alt="Preview" style={{ width: '44px', height: '44px', objectFit: 'cover', borderRadius: '6px', border: '1px solid #A7F3D0' }} />
             <div>
               <p style={{ margin: 0, fontSize: '12px', fontWeight: 700, color: '#065F46' }}>
-                Will save as: <code style={{ background: '#D1FAE5', padding: '1px 5px', borderRadius: '3px' }}>{fileName || '[name]'}.webp</code>
+                Will be uploaded to secure storage
               </p>
               <p style={{ margin: '2px 0 0', fontSize: '11px', color: '#6B7280' }}>Auto-converted to WebP</p>
             </div>
@@ -1077,7 +1080,6 @@ function EditProductRow({ prod, categories, allProducts, onSave, onCancel }: { p
     reader.readAsDataURL(file);
   };
 
-  const fileName = name.replace(/\s+/g, '');
   const currentImage = prod.metadata?.images?.[0];
 
   return (
@@ -1162,6 +1164,7 @@ function EditProductRow({ prod, categories, allProducts, onSave, onCancel }: { p
                 const formData = new FormData();
                 formData.append('file', imageFile);
                 formData.append('name', name);
+                formData.append('productId', prod.id);
                 const uploadRes = await fetch('/api/upload-image', { method: 'POST', body: formData });
                 if (!uploadRes.ok) {
                   const err = await uploadRes.json();
@@ -1340,12 +1343,16 @@ export default function HistoryPage() {
     try {
       // 1. Delete from database
       await api.delete(`/admin/products/products/${productId}`);
-      // 2. Best-effort image deletion — don't block UI if file is missing
+      // 2. Best-effort image deletion — don't block UI if file is missing.
+      // Pass the stored URL so Supabase Storage objects are removed by key.
+      const imageUrl = categories
+        .flatMap(c => c.products)
+        .find(p => p.id === productId)?.metadata?.images?.[0];
       try {
         await fetch('/api/delete-image', {
           method: 'DELETE',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name: productName }),
+          body: JSON.stringify({ name: productName, url: imageUrl }),
         });
       } catch {
         // Image deletion is non-critical — silently ignore

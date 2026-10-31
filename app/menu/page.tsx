@@ -478,7 +478,7 @@ function CatalogContent() {
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-brown" />
             <input
               type="text"
-              placeholder="Search sweet names or ingredients..."
+              placeholder="Search sweet names"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-10 pr-10 py-2.5 text-xs bg-white border border-border rounded-lg text-primary-deep placeholder-brown/60 font-body focus:outline-none focus:ring-1 focus:ring-primary shadow-sm"
