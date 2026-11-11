@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://murad-sweets-user-frontend.onrender.com/';
+  const baseUrl = (process.env.NEXT_PUBLIC_BASE_URL || 'https://muradsweets.com').replace(/\/+$/, '');
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
 
   const routes: MetadataRoute.Sitemap = [
